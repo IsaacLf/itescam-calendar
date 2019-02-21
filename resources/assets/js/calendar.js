@@ -292,8 +292,10 @@ var ITESCAM;
                     year: month.year,
                     name: name,
                     abbr: (typeof name === "string") ? name.substring(0, 3) : undefined,
-                    color: '-moz-linear-gradient(left, black, grey 30%, green 30%, white)'
+                    color: '',
+                    events: []
                 });
+                //color : '-moz-linear-gradient(left, black, grey 30%, green 30%, white)'
                 currentDay++;
             }
             return days;
@@ -508,6 +510,118 @@ var ITESCAM;
             }
             console.log(first, second, response);
             return response;
+        };
+        /**
+         * This gets the events and assigns them to the calendar, and it normalizes the date that comes as string.
+         * We receive a string date of the format `yyyy-MM-dd`
+         * @param events
+         */
+        Calendar.prototype.setEvents = function (events) {
+            var nomEvents = [];
+            events.forEach(function (event) {
+                if (typeof event.startDate === "string" && typeof event.endDate === "string") {
+                    /// sdA & edA stands for startDateArray and end... the same.
+                    var sdA = event.startDate.split('-').map(function (n) { return parseInt(n); });
+                    var edA = event.endDate.split('-').map(function (n) { return parseInt(n); });
+                    //var[0] = YEAR, var[1] = MONTH, var[2] = DAY
+                    nomEvents.push({
+                        id: event.id,
+                        name: event.name,
+                        typeId: event.typeId,
+                        startDate: new MDate(sdA[2], sdA[1], sdA[0]),
+                        endDate: new MDate(edA[2], edA[1], edA[0])
+                    });
+                }
+            });
+            this.events = nomEvents;
+            // this.events = events;
+        };
+        Calendar.prototype.setEventsType = function (eventTypes) {
+            this.eventTypes = eventTypes;
+        };
+        Calendar.prototype.populateDayWEvents = function () {
+            var el = this;
+            el.restoreDayEvents();
+            el.events.forEach(function (event) {
+                if (typeof event.startDate !== "string" && typeof event.endDate !== "string") {
+                    var sy = event.startDate.year.value, ey = event.endDate.year.value;
+                    var sm = event.startDate.month.value, em = event.endDate.month.value;
+                    var sd = event.startDate.day.value, ed = event.endDate.day.value;
+                    var cy = void 0, cm = void 0;
+                    for (var _i = 0, _a = el.period.years; _i < _a.length; _i++) {
+                        var year = _a[_i];
+                        if (year.value >= sy && year.value <= ey) {
+                            cy = year.value;
+                            for (var _b = 0, _c = year.months; _b < _c.length; _b++) {
+                                var month = _c[_b];
+                                if ((month.value >= sm && cy == sy) || (month.value <= em && cy > sy && cy <= ey)) {
+                                    cm = month.value;
+                                    for (var _d = 0, _e = month.days; _d < _e.length; _d++) {
+                                        var day = _e[_d];
+                                        if ((day.value >= sd && cm == sm && day.value <= ed) || (day.value <= ed && cm > sm && cm <= em)) {
+                                            day.events.push(event);
+                                        }
+                                    }
+                                    el.updateWeeksForSheet(month);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        };
+        Calendar.prototype.updateWeeksForSheet = function (month) {
+            var _loop_1 = function (day) {
+                var evLength = day.events.length;
+                if (evLength == 1) {
+                    var evType = this_1.eventTypes.find(function (et) { return et.id === day.events[0].typeId; });
+                    day.color = evType.color;
+                }
+                else if (evLength == 2) {
+                    var evType1 = this_1.eventTypes.find(function (et) { return et.id === day.events[0].typeId; });
+                    var evType2 = this_1.eventTypes.find(function (et) { return et.id === day.events[1].typeId; });
+                    day.color = "-moz-linear-gradient(90deg, " + evType1.color + " 50%, " + evType2.color + " 50%)";
+                }
+                else if (evLength >= 3) {
+                }
+            };
+            var this_1 = this;
+            for (var _i = 0, _a = month.days; _i < _a.length; _i++) {
+                var day = _a[_i];
+                _loop_1(day);
+            }
+            var weeks = this.getWeeksForCalendar(month.days);
+            month.weeks = weeks;
+        };
+        Calendar.prototype.restoreDayEvents = function () {
+            var el = this;
+            el.events.forEach(function (event) {
+                if (typeof event.startDate !== "string" && typeof event.endDate !== "string") {
+                    var sy = event.startDate.year.value, ey = event.endDate.year.value;
+                    var sm = event.startDate.month.value, em = event.endDate.month.value;
+                    var sd = event.startDate.day.value, ed = event.endDate.day.value;
+                    var cy = void 0, cm = void 0;
+                    for (var _i = 0, _a = el.period.years; _i < _a.length; _i++) {
+                        var year = _a[_i];
+                        if (year.value >= sy && year.value <= ey) {
+                            cy = year.value;
+                            for (var _b = 0, _c = year.months; _b < _c.length; _b++) {
+                                var month = _c[_b];
+                                if ((month.value >= sm && cy == sy) || (month.value <= em && cy > sy && cy <= ey)) {
+                                    cm = month.value;
+                                    for (var _d = 0, _e = month.days; _d < _e.length; _d++) {
+                                        var day = _e[_d];
+                                        if ((day.value >= sd && cm == sm && day.value <= ed) || (day.value <= ed && cm > sm && cm <= em)) {
+                                            day.events = [];
+                                        }
+                                    }
+                                    el.updateWeeksForSheet(month);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         };
         return Calendar;
     }());

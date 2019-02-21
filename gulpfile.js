@@ -17,7 +17,7 @@ require('laravel-elixir-typescript');
 elixir((mix) => {
     mix.sass('app.scss')
        .styles('./node_modules/bootstrap-vue/dist/bootstrap-vue', 'public/css/calendar.css')
-       .typescript('./resources/assets/ts/calendar.ts', './resources/assets/js')
+       .typescript('./resources/assets/ts/calendar.ts', './resources/assets/js', null, { 'lib': ['es6', 'dom'] })
        .webpack('app.js')
        .webpack('calendario.js')
        ;

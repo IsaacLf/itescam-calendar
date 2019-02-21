@@ -14,6 +14,7 @@ $factory->define(App\Event::class, function (Faker $faker) {
         'name' => $faker->bothify('Evento ####'), 
         'typeId'=> $faker->numberBetween($min = 1, $max = 8),
         'startDate' => $start,
-        'endDate' => $end
+        'endDate' => $end,
+        'description' => $faker->realText($maxNbChars = 30, $indexSize = 2)
     ];
 });

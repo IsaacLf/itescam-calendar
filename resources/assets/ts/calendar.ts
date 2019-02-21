@@ -70,12 +70,21 @@ namespace ITESCAM {
   }
 
   export interface Event {
-    type: string;
+    id: number;
     name: string;
-    important: boolean;
-    iconPath: string;
+    typeId: number;
+    startDate?: MDate | string;
+    endDate?: MDate | string;
+    important?: boolean;
+    iconPath?: string;
     url?: string;
     description?: string;
+  }
+
+  export interface EventType {
+    id: number;
+    name: string;
+    color: string;
   }
   
   export class MDate {
@@ -166,6 +175,8 @@ namespace ITESCAM {
 
   export class Calendar {
     period!: Period;
+    eventTypes?: EventType[];
+    events?: Event[];
     // cycles?: Cycle[];
     constructor()
     constructor(startDate?: MDate, endDate?: MDate) {
@@ -337,15 +348,17 @@ namespace ITESCAM {
       let year = (typeof month.year !== "undefined") ? month.year.value : 2000;
       let name: string;
       while(currentDay <= endDay){
-        name = Calendar.getDayName(currentDay, month.value, year);
+        name = Calendar.getDayName(currentDay, month.value, year)!;
         days.push({
           value: currentDay,
           month: mon,
           year: month.year,
           name: name,
           abbr: (typeof name === "string") ? name.substring(0, 3) : undefined,
-          color: '-moz-linear-gradient(left, black, grey 30%, green 30%, white)'
+          color: '',
+          events: []
         });
+        //color : '-moz-linear-gradient(left, black, grey 30%, green 30%, white)'
         currentDay++;
       }
       return days;
@@ -384,7 +397,7 @@ namespace ITESCAM {
           }
         }
         if(lastDay.name != constDays[constDays.length-1].name){
-          for(let i = constDays.map(e => e.name).indexOf(lastDay.name) + 1; i < constDays.length; i++){
+          for(let i = constDays.map(e => e.name).indexOf(lastDay.name!) + 1; i < constDays.length; i++){
             daysOfWeek.push({
               value: 0,
               name: constDays[i].name
@@ -569,6 +582,106 @@ namespace ITESCAM {
       }
       console.log(first, second, response);
       return response;
+    }
+    /**
+     * This gets the events and assigns them to the calendar, and it normalizes the date that comes as string.
+     * We receive a string date of the format `yyyy-MM-dd`
+     * @param events 
+     */
+    setEvents(events: Event[]) {
+      let nomEvents: Event[] =  [];
+      events.forEach(event => {
+        if(typeof event.startDate === "string" && typeof event.endDate === "string"){
+          /// sdA & edA stands for startDateArray and end... the same.
+          let sdA = event.startDate.split('-').map(n => parseInt(n));
+          let edA = event.endDate.split('-').map(n => parseInt(n));
+          //var[0] = YEAR, var[1] = MONTH, var[2] = DAY
+          nomEvents.push({
+            id: event.id,
+            name: event.name,
+            typeId: event.typeId,
+            startDate: new MDate(sdA[2], sdA[1], sdA[0]),
+            endDate: new MDate(edA[2], edA[1], edA[0])
+          })
+        }
+      });
+      this.events = nomEvents;
+      // this.events = events;
+    }
+    setEventsType(eventTypes: EventType[]){
+      this.eventTypes = eventTypes;
+    }
+    populateDayWEvents(){
+      let el = this;
+      el.restoreDayEvents();
+      el.events.forEach(event => {
+        if (typeof event.startDate !== "string" && typeof event.endDate !== "string"){
+          const sy = event.startDate.year.value, ey = event.endDate.year.value;
+          const sm = event.startDate.month.value, em = event.endDate.month.value;
+          const sd = event.startDate.day.value, ed = event.endDate.day.value;
+          let cy: number, cm: number;
+          for (const year of el.period.years) {
+            if(year.value >= sy && year.value <= ey){
+              cy = year.value;
+              for (const month of year.months) {
+                if((month.value >= sm && cy == sy) || (month.value <= em && cy > sy && cy <= ey)){
+                  cm = month.value;
+                  for (const day of month.days) {
+                    if((day.value >= sd && cm == sm && day.value <= ed) || (day.value <= ed && cm > sm && cm <= em)){
+                      day.events.push(event);
+                    }
+                  }
+                  el.updateWeeksForSheet(month);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    updateWeeksForSheet(month: Month){
+      for (const day of month.days) {
+        const evLength = day.events.length;
+        if(evLength == 1){
+          const evType = this.eventTypes.find(et => et.id === day.events[0].typeId);
+          day.color = evType.color;
+        }else if(evLength == 2){
+          const evType1 = this.eventTypes.find(et => et.id === day.events[0].typeId);
+          const evType2 = this.eventTypes.find(et => et.id === day.events[1].typeId);
+          day.color = `-moz-linear-gradient(90deg, ${evType1.color} 50%, ${evType2.color} 50%)`;
+        }else if(evLength >= 3){
+          
+        }
+      }
+      let weeks: Week[] = this.getWeeksForCalendar(month.days);
+      month.weeks = weeks;
+    }
+    restoreDayEvents(){
+      let el = this;
+      el.events.forEach(event => {
+        if (typeof event.startDate !== "string" && typeof event.endDate !== "string"){
+          const sy = event.startDate.year.value, ey = event.endDate.year.value;
+          const sm = event.startDate.month.value, em = event.endDate.month.value;
+          const sd = event.startDate.day.value, ed = event.endDate.day.value;
+          let cy: number, cm: number;
+          for (const year of el.period.years) {
+            if(year.value >= sy && year.value <= ey){
+              cy = year.value;
+              for (const month of year.months) {
+                if((month.value >= sm && cy == sy) || (month.value <= em && cy > sy && cy <= ey)){
+                  cm = month.value;
+                  for (const day of month.days) {
+                    if((day.value >= sd && cm == sm && day.value <= ed) || (day.value <= ed && cm > sm && cm <= em)){
+                      day.events = [];
+                    }
+                  }
+                  el.updateWeeksForSheet(month);
+                }
+              }
+            }
+          }
+        }
+      });
     }
   }
 }

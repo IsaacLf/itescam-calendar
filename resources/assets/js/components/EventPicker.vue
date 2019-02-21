@@ -166,6 +166,7 @@ export default {
         return this.eventTArray;
       },
       set: function(array) {
+        this.$emit('eventsTChange', array);
         this.eventTArray = array;
       }
     },
@@ -174,6 +175,7 @@ export default {
         return this.eventArray;
       },
       set: function(array) {
+        this.$emit('eventsChange', array);
         this.eventArray = array;
       }
     },

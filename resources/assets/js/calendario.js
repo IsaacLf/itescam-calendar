@@ -13,3 +13,10 @@ const app = new Vue({
   el: '#app',
   store,  
 });
+
+
+$(document).ready(function () {
+  let evSelect =  document.querySelector('[id="list-tab"]').childNodes[0];
+  evSelect.classList.add('active', 'show'); 
+  document.querySelector(`[id="${evSelect.hash.substring(1)}"]`).classList.add('active', 'show');
+});

@@ -23,7 +23,7 @@
     "lodash": "^4.16.2",
     "popper.js": "^1.14.6",
     "sweetalert2": "^8.0.5",
-    "typescript": "^3.2.4",
+    "typescript": "^3.3.3",
     "vue": "^2.0.1",
     "vue-color": "^2.7.0",
     "vue-resource": "^1.0.3",

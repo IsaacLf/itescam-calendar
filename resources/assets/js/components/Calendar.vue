@@ -24,7 +24,7 @@
               <tbody>
                 <tr v-for="week of month.weeks" :key="week.id" class="week">
                   <td v-for="day of week.days" :key="day.id" class="no-text-select" :style="{ background: day.color }">
-                    {{ day.value > 0 ? day.value : "" }}
+                    {{ day.value > 0 ? ((typeof day.events !== "undefined" && day.events.length > 0) ? day.events.length+"EV" : day.value): "" }}
                   </td>
                 </tr>
               </tbody>
@@ -40,20 +40,24 @@
 import { Calendar, MDate as Date } from '../calendar';
 export default {
   props: {
-    events: Array
+    events: Array,
+    eventstype: Array,
   },
   data: function () {
     return {
       per: {},
       done: false,
       constDays: [],
-      dayArr: []
+      dayArr: [],
+      calendar: {}
     }
   },
   created: function () {
     let obj = new Calendar(new Date(1,8,2017), new Date(31,7,2018));
-    this.per = obj.period;
-    console.log(this.per);
+    this.calendar = obj;
+    this.calendar.setEvents(this.events);
+    this.calendar.setEventsType(this.eventstype);
+    this.calendar.populateDayWEvents();
     this.constDays = [
       { value: 0, name: "domingo" },
       { value: 1, name: "lunes" },
@@ -63,11 +67,25 @@ export default {
       { value: 5, name: "viernes" },
       { value: 6, name: "sábado" },
     ];
+    // this.per = this.calendar.period;
+    console.log(this.calendar.events, this.calendar.period.years);
     // console.log(this.per);
   },
   computed: {
-    period: function () { return this.per },
-    periodName: function () { return  `Ciclo ${this.per.name}` },
+    period: function () { return this.calendar.period },
+    periodName: function () { return  `Ciclo ${this.calendar.period.name}` },
+  },
+  watch:{
+    events: function(newVal, oldVal){
+      // console.log('Events Changed: ', newVal);
+      this.calendar.setEvents(newVal);
+      this.calendar.populateDayWEvents();
+    },
+    eventstype: function (newVal, oldVal){
+      // console.log('EventsType Changed: ', newVal);
+      this.calendar.setEventsType(newVal);
+      this.calendar.populateDayWEvents();
+    }
   },
   methods: {
   }
