@@ -2,34 +2,20 @@
 var ITESCAM;
 (function (ITESCAM) {
     var constMonths = [
-        { name: "enero", value: 1, numdays: 31 },
-        { name: "febrero", value: 2, numdays: 28 },
-        { name: "marzo", value: 3, numdays: 31 },
-        { name: "abril", value: 4, numdays: 30 },
-        { name: "mayo", value: 5, numdays: 31 },
-        { name: "junio", value: 6, numdays: 30 },
-        { name: "julio", value: 7, numdays: 31 },
-        { name: "agosto", value: 8, numdays: 31 },
-        { name: "septiembre", value: 9, numdays: 30 },
-        { name: "octubre", value: 10, numdays: 31 },
-        { name: "noviembre", value: 11, numdays: 30 },
-        { name: "diciembre", value: 12, numdays: 31 },
+        { name: "enero", value: 1, numdays: 31, zellerVal: 11 },
+        { name: "febrero", value: 2, numdays: 28, zellerVal: 12 },
+        { name: "marzo", value: 3, numdays: 31, zellerVal: 1 },
+        { name: "abril", value: 4, numdays: 30, zellerVal: 2 },
+        { name: "mayo", value: 5, numdays: 31, zellerVal: 3 },
+        { name: "junio", value: 6, numdays: 30, zellerVal: 4 },
+        { name: "julio", value: 7, numdays: 31, zellerVal: 5 },
+        { name: "agosto", value: 8, numdays: 31, zellerVal: 6 },
+        { name: "septiembre", value: 9, numdays: 30, zellerVal: 7 },
+        { name: "octubre", value: 10, numdays: 31, zellerVal: 8 },
+        { name: "noviembre", value: 11, numdays: 30, zellerVal: 9 },
+        { name: "diciembre", value: 12, numdays: 31, zellerVal: 10 },
     ];
-    var zellerMonths = [
-        { name: "enero", value: 11, numdays: 31 },
-        { name: "febrero", value: 12, numdays: 28 },
-        { name: "marzo", value: 1, numdays: 31 },
-        { name: "abril", value: 2, numdays: 30 },
-        { name: "mayo", value: 3, numdays: 31 },
-        { name: "junio", value: 4, numdays: 30 },
-        { name: "julio", value: 5, numdays: 31 },
-        { name: "agosto", value: 6, numdays: 31 },
-        { name: "septiembre", value: 7, numdays: 30 },
-        { name: "octubre", value: 8, numdays: 31 },
-        { name: "noviembre", value: 9, numdays: 30 },
-        { name: "diciembre", value: 10, numdays: 31 },
-    ];
-    var constDays = [
+    ITESCAM.constDays = [
         { name: "domingo" },
         { name: "lunes" },
         { name: "martes" },
@@ -111,6 +97,7 @@ var ITESCAM;
         function Calendar(startDate, endDate) {
             if (typeof startDate !== "undefined" && typeof endDate !== "undefined") {
                 this.period = this.createPeriod(startDate, endDate);
+                this.periods = [];
             }
             else {
                 this.period = this.emptyPeriod();
@@ -140,6 +127,23 @@ var ITESCAM;
         };
         Calendar.prototype.setPeriod = function (period) {
             this.period = period;
+        };
+        /**
+         * Tries to add a new period to the periods array, if exists already it returns `false`, else `true`
+         * @param period
+         */
+        Calendar.prototype.addPeriod = function (period) {
+            if (this.periods.find(function (elem) { return elem.name == period.name; }))
+                return false;
+            this.periods.push(period);
+            return true;
+        };
+        Calendar.prototype.setActivePeriod = function (period) {
+            var active;
+            if (active = this.periods.find(function (elem) { return elem.name == period.name; }))
+                return false;
+            this.period = active;
+            return true;
         };
         /* End Period Methods*/
         /* Start cycles Methods */
@@ -172,9 +176,9 @@ var ITESCAM;
         Calendar.prototype.getYears = function (startDate, endDate) {
             var years = [];
             var startYear = startDate.year.value, endYear = endDate.year.value;
-            var currentYear = startYear;
             var startMonth = startDate.month.value, lastMonth = endDate.month.value;
             var startDay = startDate.day.value, lastDay = endDate.day.value;
+            var currentYear = startYear;
             var month;
             while (currentYear <= endYear) {
                 month = constMonths[0];
@@ -311,8 +315,8 @@ var ITESCAM;
             if (typeof days !== "undefined") {
                 startDay = days[0];
                 lastDay = days[days.length - 1];
-                if (startDay.name != constDays[0].name) {
-                    for (var _i = 0, constDays_1 = constDays; _i < constDays_1.length; _i++) {
+                if (startDay.name != ITESCAM.constDays[0].name) {
+                    for (var _i = 0, constDays_1 = ITESCAM.constDays; _i < constDays_1.length; _i++) {
                         var day = constDays_1[_i];
                         if (day.name == startDay.name) {
                             break;
@@ -336,11 +340,11 @@ var ITESCAM;
                         daysOfWeek = [];
                     }
                 }
-                if (lastDay.name != constDays[constDays.length - 1].name) {
-                    for (var i = constDays.map(function (e) { return e.name; }).indexOf(lastDay.name) + 1; i < constDays.length; i++) {
+                if (lastDay.name != ITESCAM.constDays[ITESCAM.constDays.length - 1].name) {
+                    for (var i = ITESCAM.constDays.map(function (e) { return e.name; }).indexOf(lastDay.name) + 1; i < ITESCAM.constDays.length; i++) {
                         daysOfWeek.push({
                             value: 0,
-                            name: constDays[i].name
+                            name: ITESCAM.constDays[i].name
                         });
                     }
                     weeks.push({
@@ -351,7 +355,7 @@ var ITESCAM;
                 if (weekNum < 6) {
                     weekNum++;
                     daysOfWeek = [];
-                    for (var _b = 0, constDays_2 = constDays; _b < constDays_2.length; _b++) {
+                    for (var _b = 0, constDays_2 = ITESCAM.constDays; _b < constDays_2.length; _b++) {
                         var day = constDays_2[_b];
                         daysOfWeek.push({
                             value: 0,
@@ -373,7 +377,7 @@ var ITESCAM;
          * @param {number} year The year in number format
          */
         Calendar.getDayName = function (day, month, year) {
-            var k = day, m = zellerMonths[month - 1].value;
+            var k = day, m = constMonths[month - 1].zellerVal;
             var yearText = year.toString();
             var C = parseInt(yearText.substring(0, 2));
             var d = parseInt(yearText.substring(2));
@@ -391,7 +395,7 @@ var ITESCAM;
             else {
                 numDay = f % 7;
             }
-            var response = constDays[numDay].name;
+            var response = ITESCAM.constDays[numDay].name;
             return response;
         };
         Calendar.prototype.searchMonth = function (month, year) {
@@ -441,7 +445,7 @@ var ITESCAM;
                 if (!hasSixWeeks) {
                     var currentDay = 0;
                     response += "<tr class=\"week\">";
-                    while (currentDay <= constDays.map(function (e) { return e.name; }).indexOf("sábado")) {
+                    while (currentDay <= ITESCAM.constDays.map(function (e) { return e.name; }).indexOf("sábado")) {
                         response += "<td></td>\n";
                         currentDay++;
                     }
@@ -453,7 +457,7 @@ var ITESCAM;
         Calendar.prototype.drawDaysGrid = function (days, isLastWeek) {
             var response = '';
             var lastDay = days[days.length - 1].name;
-            for (var _i = 0, constDays_3 = constDays; _i < constDays_3.length; _i++) {
+            for (var _i = 0, constDays_3 = ITESCAM.constDays; _i < constDays_3.length; _i++) {
                 var day = constDays_3[_i];
                 if (day.name === days[0].name) {
                     break;
@@ -465,9 +469,9 @@ var ITESCAM;
                 response +=
                     "<td id=\"" + day.value + "_" + day.month.value + "_" + day.year.value + "\">" + day.value + "</td>\n";
             }
-            if (isLastWeek && lastDay !== constDays[6].name) {
-                var currentDay = constDays.map(function (e) { return e.name; }).indexOf(lastDay);
-                while (currentDay !== constDays.map(function (e) { return e.name; }).indexOf("sábado")) {
+            if (isLastWeek && lastDay !== ITESCAM.constDays[6].name) {
+                var currentDay = ITESCAM.constDays.map(function (e) { return e.name; }).indexOf(lastDay);
+                while (currentDay !== ITESCAM.constDays.map(function (e) { return e.name; }).indexOf("sábado")) {
                     response += "<td></td>\n";
                     currentDay++;
                 }

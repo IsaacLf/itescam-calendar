@@ -1,20 +1,33 @@
 <template>
-  <div class="admin-container">
-      <div class="grid-item">
-      <event-picker 
-        v-bind:eventstype="EventsType"
-        v-bind:events="Events"
-        v-on:eventsChange="updateEvents"
-        v-on:eventsTChange="updateEventsType"
-      ></event-picker>
+<div>
+  <header class="header" :class="$mq">
+    <h1>Calendario ITESCAM</h1>
+  </header>
+  <a v-if="User.admin" id="addEvent" href="javascript:void(0)" role="button" class="float" :class="$mq" title="Añadir evento">
+    <font-awesome-icon class="icon" icon="calendar-plus"/>
+  </a>
+  <!-- <a href="#!" class="float add" :class="$mq">
+    <font-awesome-icon class="icon" icon="grip-lines-vertical"/>
+  </a> -->
+  <div class="admin-container" :class="$mq">
+    <div id="eventpicker" :class="$mq">
+    <event-picker
+      v-bind:eventstype="EventsType"
+      v-bind:events="Events"
+      v-bind:user="User"
+      v-on:eventsChange="updateEvents"
+      v-on:eventsTChange="updateEventsType"
+    ></event-picker>
     </div>
-    <div class="grid-item">
-      <calendar 
+    <div id="calendar" :class="$mq">
+      <calendar
         v-bind:eventstype="EventsType"
         v-bind:events="Events"
+        v-bind:current="currentPeriod"
       ></calendar>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -29,11 +42,15 @@ export default {
   data: function () {
     return {
       eventss: [],
-      eventsstype: []
+      eventsstype: [],
+      user: { //This will be a prop
+        name: "Nose",
+        admin: true
+      },
+      currentPeriod: '2017-2018' //This will also be a prop
     }
   },
   created: function(){
-    // console.log(store.state);
     this.Events = this.events;
     this.EventsType = this.eventstype;
   },
@@ -52,6 +69,14 @@ export default {
       },
       get: function(){
         return this.eventsstype;
+      }
+    },
+    User: {
+      set: function(val){
+        this.user = val;
+      },
+      get: function() {
+        return this.user;
       }
     }
   },

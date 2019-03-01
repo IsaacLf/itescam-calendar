@@ -1,36 +1,21 @@
 namespace ITESCAM {
 
-  const constMonths: Month[] = [
-    { name: "enero", value: 1, numdays: 31 },
-    { name: "febrero", value: 2, numdays: 28 },
-    { name: "marzo", value: 3, numdays: 31 },
-    { name: "abril", value: 4, numdays: 30 },
-    { name: "mayo", value: 5, numdays: 31 },
-    { name: "junio", value: 6, numdays: 30 },
-    { name: "julio", value: 7, numdays: 31 },
-    { name: "agosto", value: 8, numdays: 31 },
-    { name: "septiembre", value: 9, numdays: 30 },
-    { name: "octubre", value: 10, numdays: 31 },
-    { name: "noviembre", value: 11, numdays: 30 },
-    { name: "diciembre", value: 12, numdays: 31 },
+  const constMonths: zellerMonth[] = [
+    { name: "enero", value: 1, numdays: 31, zellerVal: 11 },
+    { name: "febrero", value: 2, numdays: 28, zellerVal: 12 },
+    { name: "marzo", value: 3, numdays: 31, zellerVal: 1 },
+    { name: "abril", value: 4, numdays: 30, zellerVal: 2 },
+    { name: "mayo", value: 5, numdays: 31, zellerVal: 3 },
+    { name: "junio", value: 6, numdays: 30, zellerVal: 4 },
+    { name: "julio", value: 7, numdays: 31, zellerVal: 5 },
+    { name: "agosto", value: 8, numdays: 31, zellerVal: 6 },
+    { name: "septiembre", value: 9, numdays: 30, zellerVal: 7 },
+    { name: "octubre", value: 10, numdays: 31, zellerVal: 8 },
+    { name: "noviembre", value: 11, numdays: 30, zellerVal: 9 },
+    { name: "diciembre", value: 12, numdays: 31, zellerVal: 10 },
   ];
 
-  const zellerMonths: Month[] = [
-    { name: "enero", value: 11, numdays: 31 },
-    { name: "febrero", value: 12, numdays: 28 },
-    { name: "marzo", value: 1, numdays: 31 },
-    { name: "abril", value: 2, numdays: 30 },
-    { name: "mayo", value: 3, numdays: 31 },
-    { name: "junio", value: 4, numdays: 30 },
-    { name: "julio", value: 5, numdays: 31 },
-    { name: "agosto", value: 6, numdays: 31 },
-    { name: "septiembre", value: 7, numdays: 30 },
-    { name: "octubre", value: 8, numdays: 31 },
-    { name: "noviembre", value: 9, numdays: 30 },
-    { name: "diciembre", value: 10, numdays: 31 },
-  ];
-
-  const constDays = [
+  export const constDays = [
     { name: "domingo" },
     { name: "lunes" },
     { name: "martes" },
@@ -59,6 +44,10 @@ namespace ITESCAM {
     year?: Year;
   }
 
+  interface zellerMonth extends Month {
+    zellerVal?: number;
+  }
+
   export interface Week {
     value: number;
     days?: Day[];
@@ -85,8 +74,9 @@ namespace ITESCAM {
     id: number;
     name: string;
     color: string;
+    required?: boolean;
   }
-  
+
   export class MDate {
     day!: Day;
     month!: Month;
@@ -158,7 +148,7 @@ namespace ITESCAM {
       year: date.year
     };
     let ndate = date;
-    ndate.day = { 
+    ndate.day = {
       value: date.day.value,
       name: name,
       abbr: (typeof name === "string") ? name.substring(0, 3) : undefined,
@@ -175,6 +165,7 @@ namespace ITESCAM {
 
   export class Calendar {
     period!: Period;
+    periods?: Period[];
     eventTypes?: EventType[];
     events?: Event[];
     // cycles?: Cycle[];
@@ -182,6 +173,7 @@ namespace ITESCAM {
     constructor(startDate?: MDate, endDate?: MDate) {
       if(typeof startDate !== "undefined" && typeof endDate !== "undefined"){
         this.period = this.createPeriod(startDate, endDate);
+        this.periods = [];
       } else {
         this.period = this.emptyPeriod();
       }
@@ -210,6 +202,23 @@ namespace ITESCAM {
     }
     setPeriod(period: Period): void {
       this.period = period;
+    }
+    /**
+     * Tries to add a new period to the periods array, if exists already it returns `false`, else `true`
+     * @param period
+     */
+    addPeriod(period: Period): boolean {
+      if(this.periods.find(elem => elem.name == period.name))
+        return false;
+      this.periods.push(period);
+      return true;
+    }
+    setActivePeriod(period: Period): boolean {
+      let active: Period | undefined;
+      if(active = this.periods.find(elem => elem.name == period.name))
+        return false;
+      this.period = active;
+      return true;
     }
     /* End Period Methods*/
     /* Start cycles Methods */
@@ -241,17 +250,17 @@ namespace ITESCAM {
     /* End Cycles Methods*/
     getYears(startDate: MDate, endDate: MDate): Year[] {
       let years: Year[] = [];
-      let startYear = startDate.year.value, endYear = endDate.year.value;
+      const startYear = startDate.year.value, endYear = endDate.year.value;
+      const startMonth = startDate.month.value, lastMonth = endDate.month.value;
+      const startDay = startDate.day.value, lastDay = endDate.day.value;
       let currentYear = startYear;
-      let startMonth = startDate.month.value, lastMonth = endDate.month.value;
-      let startDay = startDate.day.value, lastDay = endDate.day.value;
-      let month;
+      let month: Month;
       while(currentYear <= endYear){
         month = constMonths[0];
         if(currentYear === endYear){
           month.year = { value: currentYear };
           years.push({
-            value: currentYear, 
+            value: currentYear,
             months: this.getMonths(month , constMonths[lastMonth-1], undefined, lastDay)
           });
         } else {
@@ -259,13 +268,13 @@ namespace ITESCAM {
             month = constMonths[startMonth-1];
             month.year = { value: currentYear };
             years.push({
-              value: currentYear, 
+              value: currentYear,
               months: this.getMonths(month, undefined , startDay, undefined)
             });
           } else {
             month.year = { value: currentYear };
             years.push({
-              value: currentYear, 
+              value: currentYear,
               months: this.getMonths(month)
             });
           }
@@ -432,7 +441,7 @@ namespace ITESCAM {
      * @param {number} year The year in number format
      */
     static getDayName(day: number, month: number, year: number): string | undefined {
-      let k = day, m = zellerMonths[month-1].value;
+      let k = day, m = constMonths[month-1].zellerVal;
       let yearText = year.toString();
       let C = parseInt(yearText.substring(0,2));
       let d = parseInt(yearText.substring(2));
@@ -479,7 +488,7 @@ namespace ITESCAM {
       let monYear = (typeof monNode.year !== "undefined") ? monNode.year.value.toString(): "";
       let yearText = capitalize(monNode.name)+' '+monYear;
       // let id = `${monNode.name!.substring(0,3)+monYear}`;
-      let HTMLText: string = 
+      let HTMLText: string =
       `<table onclick="toggleView(this)" data-year="${monYear}" data-month="${monNode.name!}">
         <tbody>
           <tr><th colspan="7">${yearText}</th></tr>
@@ -502,7 +511,7 @@ namespace ITESCAM {
       if(typeof weeks !== "undefined"){
         for (const week of weeks) {
           if(week.value === lastWeek){ isLastWeek = true; }
-          response += 
+          response +=
           `<tr class="week">
             ${this.drawDaysGrid(week.days!, isLastWeek)}
           </tr>\n`;
@@ -520,7 +529,7 @@ namespace ITESCAM {
       return response;
     }
     drawDaysGrid(days: Day[], isLastWeek: boolean): string {
-      let response = ''; 
+      let response = '';
       let lastDay = days[days.length-1].name;
       for (const day of constDays) {
         if(day.name === days[0].name){
@@ -529,7 +538,7 @@ namespace ITESCAM {
         response += `<td></td>\n`;
       }
       for (const day of days) {
-        response += 
+        response +=
         `<td id="${day.value}_${day.month!.value}_${day.year!.value}">${day.value}</td>\n`;
       }
       if(isLastWeek && lastDay !== constDays[6].name){
@@ -544,8 +553,8 @@ namespace ITESCAM {
     getAllMonthsHTML(months: Month[]): string {
       let text = '';
       for (const month of months) {
-        text += 
-        `<div class="month" id="${month.name!.substring(0,3)+month.year!.value}">` 
+        text +=
+        `<div class="month" id="${month.name!.substring(0,3)+month.year!.value}">`
           + this.getTableHTML(month.value, month.year!.value)
         +'</div>\n';
       }
@@ -576,7 +585,7 @@ namespace ITESCAM {
       if(first === second){
         response = 0;
       } else if(first > second){
-        response = 1; 
+        response = 1;
       } else {
         response = -1;
       }
@@ -586,7 +595,7 @@ namespace ITESCAM {
     /**
      * This gets the events and assigns them to the calendar, and it normalizes the date that comes as string.
      * We receive a string date of the format `yyyy-MM-dd`
-     * @param events 
+     * @param events
      */
     setEvents(events: Event[]) {
       let nomEvents: Event[] =  [];
@@ -650,7 +659,7 @@ namespace ITESCAM {
           const evType2 = this.eventTypes.find(et => et.id === day.events[1].typeId);
           day.color = `-moz-linear-gradient(90deg, ${evType1.color} 50%, ${evType2.color} 50%)`;
         }else if(evLength >= 3){
-          
+
         }
       }
       let weeks: Week[] = this.getWeeksForCalendar(month.days);

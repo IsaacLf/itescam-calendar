@@ -1,11 +1,19 @@
 <template>
   <div class="event-picker-container">
-    <h1 class="title">Referencia de eventos</h1>
+    <a @click="[ user.admin ? slideEvTypes() : displayEvTypes() ]"
+      :class="$mq"
+      id="slider"
+      draggable="false"
+      href="javascript:void(0)" role="button" class="float">
+      <font-awesome-icon v-show="toggled" class="icon" icon="angle-double-left"/>
+      <font-awesome-icon v-show="!toggled" class="icon" icon="angle-double-right"/>
+    </a>
+    <h1 class="title non-user-select">Referencia de eventos</h1>
     <table id="events" style="width: 100%; padding-right: 1em;">
       <tbody>
         <tr v-for="item of EventsType" :key="item.id" @click="select(item.id)" class="selectable">
           <td width="20%" class="text-center" style="">
-            <canvas width="20px" height="20px" style="border: 2px solid white;" v-bind:style="{ background: item.color }"></canvas>
+            <canvas width="20px" height="20px" style="border: 2px solid #090B10;" v-bind:style="{ background: item.color }"></canvas>
           </td>
           <td width="65%" style="font-variant: small-caps;">
             {{ item.name }}
@@ -20,17 +28,17 @@
       <div class="btn-group" role="group" aria-label="Events buttons">
         <button @click="addNewEventType()" class="btn btn-sm btn-danger" type="button" data-toggle="modal" data-target="#typeEventPick">
           <span>
-            <font-awesome-icon icon="calendar-plus"/>
+            <font-awesome-icon :icon="['fab','elementor']"/>
           </span>
-          Tipo de evento
+          {{ !($mq == 'mobile'||$mq=='tablet') ? 'Tipo de evento' : ''}}
         </button>
         <button class="btn btn-sm btn-primary" type="button" data-toggle="modal" data-target="#eventModal">
-          <font-awesome-icon icon="calendar-day"/>
-          Eventos
+          <font-awesome-icon icon="calendar-week"/>
+          {{ !($mq == 'mobile'||$mq=='tablet') ? 'Eventos' : ''}}
         </button>
         <button @click="editSelected()" class="btn btn-sm btn-success" type="button" data-toggle="modal" data-target="#typeEventPick">
           <font-awesome-icon icon="edit"/>
-          Editar
+          {{ !($mq == 'mobile'||$mq=='tablet') ? 'Editar' : ''}}
         </button>
       </div>
     </div>
@@ -88,7 +96,18 @@
                   <div v-for="event of Events" :key="event.id" class="tab-pane fade" :id="'list-'+event.id" role="tabpanel" aria-labelledby="list">
                     <h1>{{event.name}}</h1>
                     <p>Inicio: {{ event.startDate }} | Final: {{ event.endDate }}</p>
-                    <small>ID de tipo: {{ event.typeId }}</small>
+                    <table style="padding-right: 1em;">
+                      <tr>
+                        <tbody>
+                          <td>
+                            <canvas width="20px" height="20px" style="border: 2px solid black;" v-bind:style="{ background: getETColor(event.typeId) }"></canvas>
+                          </td>
+                          <td>
+                            <small>{{ getETName(event.typeId) }}</small>
+                          </td>
+                        </tbody>
+                      </tr>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -117,14 +136,11 @@ const Toast = Swal.mixin({
 export default {
   props: {
     eventstype: Array,
-    events: Array
+    events: Array,
+    user: Object
   },
   data: function () {
     return {
-      array: [
-        { id: 1, name: "Nombre del evento", eventType: 1, startDate: "1/1/2018", endDate: "10/1/2018" },
-      ],      
-      period: {},
       iSelected: 0,
       eSelected: 0,
       colors: '#090B10',
@@ -132,7 +148,8 @@ export default {
       modText: 'Agregar nuevo tipo de evento',
       eventTArray: [],
       eventArray: [],
-      edit: false
+      edit: false,
+      toggled: false
     }
   },
   created: function() {
@@ -143,6 +160,24 @@ export default {
     /* JUST TO FETCH */
     // store.dispatch("fetchEventsType", {self: this});
     // store.dispatch("fetchEvents", {self: this});
+  },
+  mounted: function() {
+    let back = document.getElementsByClassName('modal-backdrop');
+    console.log(back);
+  },
+  watch: {
+    $mq: function(nue, old){
+      if(old == 'tablet' || old == 'mobile'){
+        if(nue == 'desktop' || nue == 'laptop'){
+          this.toggled = false;
+          let slid = document.getElementById('slider');
+          let evpicker = document.getElementById('eventpicker');
+          evpicker.style.width = '0px';
+          slid.classList.remove('slide-in');
+          slid.classList.add('slide-out');
+        }
+      }
+    }
   },
   computed: {
     selected: {
@@ -231,16 +266,10 @@ export default {
       }
     },
     editSelected: function (){
-      this.Edit = true;
-      this.modalText = 'Editar tipo de evento';
-      let selectedEvent = {};
-      for (let i = 0; i < this.EventsType.length; i++) {
-        let event = this.EventsType[i];
-        if(this.selected == event.id){
-          selectedEvent = event;
-          break;
-        }
-      }
+      let el = this;
+      el.Edit = true;
+      el.modalText = 'Editar tipo de evento';
+      let selectedEvent = el.EventsType.find(item => el.selected == item.id);
       this.colors = selectedEvent.color;
       this.ETName = selectedEvent.name;
     },
@@ -333,6 +362,31 @@ export default {
         $('#typeEventPick').modal('hide');
         el.dismissData();
       })
+    },
+    getETColor: function(id) {
+      let evtype = this.EventsType.find(et => et.id == id);
+      return evtype.color;
+    },
+    getETName: function(id) {
+      let evtype = this.EventsType.find(et => et.id == id);
+      return evtype.name;
+    },
+    slideEvTypes: function(){
+      let slid = document.getElementById('slider');
+      let evpicker = document.getElementById('eventpicker');
+      if(this.toggled){
+        evpicker.style.width = '0px';
+        slid.classList.remove('slide-in');
+        slid.classList.add('slide-out');
+      } else {
+        evpicker.style.width = '300px';
+        slid.classList.remove('slide-out');
+        slid.classList.add('slide-in');
+      }
+      this.toggled = !this.toggled;
+    },
+    displayEvTypes: function(){
+      console.log('now display');
     }
   },
   components: {
@@ -358,7 +412,7 @@ export default {
   .event-picker-container {
     width: 100%;
     height: 100%;
-    background: rgb(9, 11, 16);
+    background: #2c3e50;
     color: white;
     border-radius: 10px;
   }

@@ -8,10 +8,7 @@
 @endsection
 
 @section('content')
-<header class="header">
-  <h1>Calendario ITESCAM</h1>
-</header>
-<app 
+<app
   v-bind:eventstype="{{ App\EventType::all() }}"
   v-bind:events="{{ App\Event::all() }}"
 ></app>

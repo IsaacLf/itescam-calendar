@@ -18,6 +18,7 @@ class CreateEventsTable extends Migration
             $table->integer('typeId');
             $table->string("name")->nullable();
             $table->text('description');
+            $table->boolean('visible');
             $table->date('startDate');
             $table->date('endDate')->nullable();
             $table->timestamps();

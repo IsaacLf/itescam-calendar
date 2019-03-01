@@ -1,0 +1,179 @@
+
+$blue: #007bff;
+$black: #000000;
+
+#calendar,
+#eventpicker {
+
+  &.desktop {
+    max-height: 900px;
+  }
+
+}
+
+.admin-container {
+  -webkit-backface-visibility: hidden;
+  &.desktop,
+  &.laptop {
+    display: grid;
+    grid-gap: 1em;
+    grid-template-columns: 24% 72%;
+    justify-content: center;
+    margin-bottom: 2em;
+  }
+
+  &.tablet,
+  &.mobile {
+    display: flex;
+    justify-content: center;
+    padding: 0 1em 1em 1em;
+  }
+
+}
+
+
+.desktop,
+.laptop {
+
+  &:not([class*=float]){
+    display: grid;
+  }
+
+  &[class*=float] {
+
+    &#addEvent {
+      @extend %float-add-props;
+    }
+
+    &#slider {
+      // @extend %float-slider-props;
+      display: none;
+    }
+
+    .icon {
+      margin-top: 22px;
+    }
+  }
+}
+
+#eventpicker{
+
+  &.tablet,
+  &.mobile {
+    height: 100%; /* 100% Full-height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    left: 0;
+    background-color: #111; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    overflow-y: hidden;
+    transition: 0.5s ease-in-out; /* 0.5 second transition effect to slide in the sidenav */
+
+    .event-picker-container {
+      padding-top: 20px;
+      border-radius: 0;
+    }
+
+    td:not(.text-center) {
+      font-size: 0.875rem;
+    }
+
+    .selectable {
+      transition: 0.3s;
+    }
+
+    table#events {
+      width: 300px !important;
+    }
+
+    .title {
+      width: 300px;
+    }
+  }
+
+  &.desktop,
+  &.laptop {
+    width: 100% !important;
+  }
+
+}
+
+.mobile, .tablet {
+
+  h1 {
+    font-size: 1.75em;
+  }
+
+  button {
+    width: 5em;
+  }
+
+  &[class*=float] {
+
+    &#addEvent {
+      @extend %float-add-props;
+    }
+
+    &#slider {
+      @extend %float-slider-props;
+      -webkit-user-drag: none;
+    }
+
+    .icon {
+      margin-top: 22px;
+    }
+  }
+
+}
+
+%float-button-props {
+  position:fixed;
+  height:60px;
+  color:#FFF;
+  text-align:center;
+  box-shadow: 2px 2px 3px #999;
+}
+
+%float-add-props {
+  @extend %float-button-props;
+  width:60px;
+  bottom:40px;
+  right:40px;
+  border-radius:50px;
+  background-color: $blue;
+}
+
+%float-slider-props {
+  @extend %float-button-props;
+  width:40px;
+  top: 47px;
+  left: 0;
+  border-radius: 0px;
+  background-color: $black;
+  z-index: 10;
+  transition: transform 0.5s ease-in-out; /* 0.5 second transition effect to slide in the sidenav */
+}
+
+.slide-in {
+  transform: translateX(260px);
+  box-shadow: -2px -2px 2px #999 !important;
+}
+
+.slide-out {
+  transform: translateX(0px);
+}
+
+.modal-backdrop {
+  z-index: 0 !important;
+}
+
+.non-user-select {
+  -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+      -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently*/
+}
