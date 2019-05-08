@@ -1,9 +1,31 @@
 <template>
   <div class="calendar-container">
-    <div class="row">
-      <div class="col-md-12">
+    <div class="title-row">
+      <div class="col-md-2 align-self-center text-center">
+        <div class="buttons-container">
+          <div id="changePeriod" class="btn-group" role="group" aria-label="changePeriod">
+            <button @click="changePeriod(false)" class="btn btn-sm btn-outline-light">
+              <font-awesome-icon icon="caret-left"></font-awesome-icon>
+            </button>
+            <button @click="changePeriod(true)" class="btn btn-sm btn-outline-light" :disabled="cantGoFurther">
+              <font-awesome-icon icon="caret-right"></font-awesome-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8">
         <div class="title">
           <h1 class="no-text-select" v-text="periodName"></h1>
+        </div>
+      </div>
+      <div class="col-md-2 align-self-center text-center">
+        <div id="calendarViews" class="btn-group" role="group" aria-label="Second group">
+          <button type="button" class="btn btn-sm btn-outline-light">
+            <font-awesome-icon icon="calendar-alt"></font-awesome-icon>
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-light">
+            <font-awesome-icon icon="calendar"></font-awesome-icon>
+          </button>
         </div>
       </div>
     </div>
@@ -73,6 +95,11 @@ export default {
   computed: {
     period: function () { return this.calendar.period },
     periodName: function () { return  `Ciclo ${this.calendar.period.name}` },
+    cantGoFurther: function() {
+      let current = this.currentPeriod;
+      let selected = this.selectedYears;
+      return (selected[0] + 1 > current[0] && selected[1] + 1 > current[1]);
+    }
   },
   watch:{
     events: function(newVal, oldVal){
@@ -86,10 +113,25 @@ export default {
       this.calendar.populateDayWEvents();
     },
     period: function (newVal, oldVal){
-      console.log(newVal, oldVal);
+      this.calendar.populateDayWEvents();
     }
   },
   methods: {
+    changePeriod: function (isNext) {
+      let current = this.selectedYears;
+      let change;
+      if(isNext){
+        change = current.map(item => item + 1);
+      } else {
+        change = current.map(item => item - 1);
+      }
+      let changePer = change.join('-');
+      let periods = this.calendar.periods;
+      if(!periods.find(elem => elem.name == changePer))
+        this.calendar.addPeriod(this.calendar.createPeriod(new Date(1,8,change[0]), new Date(31,8,change[1])));
+      this.calendar.setActivePeriod(changePer);
+      this.selectedYears = change;
+    }
   }
 }
 </script>
@@ -106,9 +148,14 @@ export default {
     border-radius: 10px;
     height: 100%;
   }
+  .title-row {
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 1rem;
+  }
   .title {
     text-align: center;
-    padding-top: 1rem;
+    padding-top: 0.5rem;
     color: white;
   }
   .content {
@@ -116,7 +163,8 @@ export default {
     margin: 1rem;
     background: white;
     display: grid;
-    grid-template-rows: 40% 40%;
+    grid-template-rows: auto auto;
+    grid-row-gap: 0.8em;
   }
   .year {
     display: grid;
@@ -168,9 +216,8 @@ export default {
     margin-bottom: 2rem;
   }
 
-  /* Responsive Classes */
-  /* .tablet .calendar-container,
-  .mobile .calendar-container {
+  #changePeriod button, #calendarViews button {
+    width: 2.5rem;
+  }
 
-  } */
 </style>

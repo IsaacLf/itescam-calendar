@@ -17,15 +17,6 @@ class EventApiController extends Controller
         return Event::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -35,7 +26,23 @@ class EventApiController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $event = new Event();
+        $event->typeId = $request->typeId;
+        $event->name = $request->name;
+        $event->description = $request->description;
+        $event->visible = $request->visible;
+        $event->startDate = $request->startDate;
+        $event->endDate = $request->endDate;
+        if($event->save()){
+          return response()->json([
+            'status' => 200,
+            'message' => 'Guardado exitosamente'
+          ]);
+        }
+        return response()->json([
+          'status' => 500,
+          'message' => 'No se pudo guardar'
+        ]);
     }
 
     /**
@@ -45,17 +52,6 @@ class EventApiController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
     {
         //
     }

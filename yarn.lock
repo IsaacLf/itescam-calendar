@@ -584,6 +584,11 @@ bootstrap-sass@^3.4.0:
   resolved "https://registry.yarnpkg.com/bootstrap-sass/-/bootstrap-sass-3.4.0.tgz#b1c330a56782347f626d31d497fa4aea16b3f99b"
   integrity sha512-qdUyw4KmNNPSIdBadn+eyuuQFH0LsZlRCs6tor1zN8sQas7mnY5JNfemauraOdNPiFQd2gFeeo3gZjZZCuohZg==
 
+bootstrap-select@^1.13.9:
+  version "1.13.9"
+  resolved "https://registry.yarnpkg.com/bootstrap-select/-/bootstrap-select-1.13.9.tgz#c3c812f862785f642413c8ca6988606ca30dda3d"
+  integrity sha512-5k+FQP2BmV/Sde4eLZa0LWARXAfC/bAO6cRByiSEpVr7BEMzc6FzC4ca5d28Y00Vmu2a+3kGqMweGz0Hm8/47w==
+
 bootstrap-vue@^2.0.0-rc.11:
   version "2.0.0-rc.11"
   resolved "https://registry.yarnpkg.com/bootstrap-vue/-/bootstrap-vue-2.0.0-rc.11.tgz#47aaa6d2a8d390477de75e636d8ea652b1d03f59"

@@ -138,12 +138,14 @@ var ITESCAM;
             this.periods.push(period);
             return true;
         };
-        Calendar.prototype.setActivePeriod = function (period) {
+        Calendar.prototype.setActivePeriod = function (name) {
             var active;
-            if (active = this.periods.find(function (elem) { return elem.name == period.name; }))
-                return false;
-            this.period = active;
-            return true;
+            active = this.periods.find(function (elem) { return elem.name == name; });
+            if (active) {
+                this.period = active;
+                return true;
+            }
+            return false;
         };
         /* End Period Methods*/
         /* Start cycles Methods */

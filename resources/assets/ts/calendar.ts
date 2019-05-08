@@ -213,12 +213,14 @@ namespace ITESCAM {
       this.periods.push(period);
       return true;
     }
-    setActivePeriod(period: Period): boolean {
+    setActivePeriod(name: string): boolean {
       let active: Period | undefined;
-      if(active = this.periods.find(elem => elem.name == period.name))
-        return false;
-      this.period = active;
-      return true;
+      active = this.periods.find(elem => elem.name == name)
+      if(active){
+        this.period = active;
+        return true;
+      }
+      return false;
     }
     /* End Period Methods*/
     /* Start cycles Methods */

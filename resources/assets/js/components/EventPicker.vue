@@ -415,6 +415,7 @@ export default {
     background: #2c3e50;
     color: white;
     border-radius: 10px;
+    border: 1px solid yellowgreen;
   }
 
   #typeEventPick, #eventModal {
