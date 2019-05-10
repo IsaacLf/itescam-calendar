@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Event as Event;
 
@@ -77,5 +78,21 @@ class EventApiController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /* Other requests in here */
+
+    public function getEventsByDate(Request $request){
+
+      $startDate = $request->startDate;
+      $endDate = $request->endDate;
+
+      $events = DB::table("events")->where([
+        ['startDate','>=', $startDate],
+        ['endDate','<=', $endDate]
+      ])->get();
+
+      return response()->json($events);
+
     }
 }

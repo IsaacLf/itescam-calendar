@@ -94,22 +94,36 @@
               <div class="col-8">
                 <div class="tab-content" id="nav-tabContent">
                   <div v-for="event of Events" :key="event.id" class="tab-pane fade" :id="'list-'+event.id" role="tabpanel" aria-labelledby="list">
-                    <h1>{{event.name}}</h1>
-                    <p>Inicio: {{ event.startDate }} | Final: {{ event.endDate }}</p>
-                    <table style="padding-right: 1em;">
-                      <tr>
-                        <tbody>
-                          <td>
-                            <canvas width="20px" height="20px" style="border: 2px solid black;" v-bind:style="{ background: getETColor(event.typeId) }"></canvas>
-                          </td>
-                          <td>
-                            <small>{{ getETName(event.typeId) }}</small>
-                          </td>
-                        </tbody>
-                      </tr>
-                    </table>
+                    <div class="card">
+                      <div class="card-body">
+                        <h4 class="card-title">{{event.name}}</h4>
+                        <p class="card-text mb-2">Inicio: {{ event.startDate }} | Final: {{ event.endDate }}</p>
+                        <table style="padding-right: 1em;">
+                          <tr>
+                            <tbody>
+                              <td>
+                                <canvas width="20px" height="20px" style="border: 2px solid black;" v-bind:style="{ background: getETColor(event.typeId) }"></canvas>
+                              </td>
+                              <td class="pl-1">
+                                <small>{{ getETName(event.typeId) }}</small>
+                              </td>
+                            </tbody>
+                          </tr>
+                        </table>
+                        <h6 class="card-subtitle mb-2 mt-2 text-muted">Descripción:</h6>
+                        <p class="card-text">{{ event.description }}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            <!-- Si no hay eventos para este año, mostrar una tarjeta -->
+            <div v-show="Events.length == 0" class="card text-center text-white bg-danger mb-3" style="width: 100%;">
+              <div class="card-header">Oh vaya!</div>
+              <div class="card-body">
+                <h5 class="card-title">No hay eventos!</h5>
+                <p class="card-text">Parece que nadie ha añadido eventos para este ciclo.</p>
               </div>
             </div>
           </div>
@@ -127,12 +141,24 @@
 import Swal from 'sweetalert2';
 import { Sketch } from 'vue-color';
 import store from '../store/store';
+import { setTimeout } from 'timers';
+
 const Toast = Swal.mixin({
   toast: true,
   position: 'top-end',
   showConfirmButton: false,
   timer: 3000
 });
+
+function selectFirstEvent(){
+  let query = document.querySelector('[id="list-tab"]');
+  if(query.childNodes.length > 0){
+    let evSelect =  query.childNodes[0];
+    evSelect.classList.add('active', 'show');
+    document.querySelector(`[id="${evSelect.hash.substring(1)}"]`).classList.add('active', 'show');
+  }
+}
+
 export default {
   props: {
     eventstype: Array,
@@ -153,17 +179,30 @@ export default {
     }
   },
   created: function() {
-    this.EventsType = this.eventstype;
-    this.Events = this.events;
-    this.selected = this.EventsType[0].id;
-    this.eventSelect = this.Events[this.Events.length - 1].id;
+    let el = this;
+    el.EventsType = el.eventstype;
+    el.selected = el.EventsType[0].id;
+
+    new Promise((resolve, reject)=>{
+
+      setTimeout(() => {
+        el.Events = el.events;
+      }, 2000);
+
+      setTimeout(() => {
+        resolve("ready")
+      }, 2500);
+
+    }).then(response => { selectFirstEvent(); })
+    // el.eventSelect = el.Events[el.Events.length - 1].id;
+
     /* JUST TO FETCH */
     // store.dispatch("fetchEventsType", {self: this});
     // store.dispatch("fetchEvents", {self: this});
   },
   mounted: function() {
-    let back = document.getElementsByClassName('modal-backdrop');
-    console.log(back);
+    // let back = document.getElementsByClassName('modal-backdrop');
+    // console.log(back);
   },
   watch: {
     $mq: function(nue, old){
@@ -177,6 +216,10 @@ export default {
           slid.classList.add('slide-out');
         }
       }
+    },
+    events: function(nue, old) {
+      this.Events = nue;
+      setTimeout(() => { selectFirstEvent(); }, 500);
     }
   },
   computed: {

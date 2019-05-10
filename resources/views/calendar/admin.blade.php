@@ -8,9 +8,10 @@
 @endsection
 
 @section('content')
+<!-- v-bind:events="{{ App\Event::all() }}" -->
 <app
   v-bind:eventstype="{{ App\EventType::all() }}"
-  v-bind:events="{{ App\Event::all() }}"
+  v-bind:currentperiod="'{{ App\Configuration::all()[0]->activeCalendar }}'"
 ></app>
 @endsection
 

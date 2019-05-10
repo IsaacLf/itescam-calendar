@@ -114,6 +114,9 @@ export default {
     },
     period: function (newVal, oldVal){
       this.calendar.populateDayWEvents();
+    },
+    selectedYears: function(newVal, oldVal) {
+      this.$emit('changeCalendar', newVal.join('-'));
     }
   },
   methods: {

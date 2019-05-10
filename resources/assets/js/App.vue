@@ -23,6 +23,7 @@
         v-bind:eventstype="EventsType"
         v-bind:events="Events"
         v-bind:current="currentPeriod"
+        v-on:changeCalendar="getCurrentEvents"
       ></calendar>
     </div>
   </div>
@@ -108,7 +109,8 @@ import store from './store/store';
 export default {
   props: {
     eventstype: Array,
-    events: Array
+    // events: Array,
+    currentperiod: String
   },
   data: function () {
     return {
@@ -118,7 +120,7 @@ export default {
         name: "Nose",
         admin: true
       },
-      currentPeriod: '2017-2018', //This will also be a prop
+      currentPeriod: '', //This will also be a prop
       evname: '',
       evtype: '',
       color: '#FFFFFF',
@@ -129,7 +131,9 @@ export default {
     }
   },
   created: function(){
-    this.Events = this.events;
+    // this.Events = this.events;
+    this.currentPeriod = this.currentperiod;
+    this.Events = [];
     this.EventsType = this.eventstype;
   },
   computed: {
@@ -212,11 +216,29 @@ export default {
       el.show = false;
       el.startDate = '';
       el.endDate = '';
+    },
+    getCurrentEvents(period){
+      let el = this;
+      const start = "-08-01"; const end = "-08-31"
+      let years = period.split('-').map(year => parseInt(year));
+      fetch('/api/events/getEvents',{
+        method: 'POST',
+        body: JSON.stringify({ startDate: `${years[0]}${start}`, endDate: `${years[1]}${end}` }),
+        headers:{
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .catch(err => console.error(err))
+      .then(res => el.Events = res)
     }
   },
   watch: {
     evtype: function (nue, old) {
       this.color = this.EventsType.find(item => item.id == nue).color;
+    },
+    currentPeriod: function(nue, old) {
+      this.getCurrentEvents(nue);
     }
   },
   components: {

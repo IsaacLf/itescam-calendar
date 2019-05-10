@@ -523,6 +523,7 @@ var ITESCAM;
          * @param events
          */
         Calendar.prototype.setEvents = function (events) {
+            if (events === void 0) { events = []; }
             var nomEvents = [];
             events.forEach(function (event) {
                 if (typeof event.startDate === "string" && typeof event.endDate === "string") {

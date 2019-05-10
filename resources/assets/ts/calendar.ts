@@ -599,7 +599,7 @@ namespace ITESCAM {
      * We receive a string date of the format `yyyy-MM-dd`
      * @param events
      */
-    setEvents(events: Event[]) {
+    setEvents(events: Event[] = []) {
       let nomEvents: Event[] =  [];
       events.forEach(event => {
         if(typeof event.startDate === "string" && typeof event.endDate === "string"){

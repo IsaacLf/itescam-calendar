@@ -23,3 +23,5 @@ Route::resource('eventType', 'EventTypeController', ['except' => [
 Route::resource('event', 'EventApiController', ['except' => [
   'create', 'show', 'edit'
 ]]);
+
+Route::post('/events/getEvents', 'EventApiController@getEventsByDate');

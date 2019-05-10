@@ -17,8 +17,8 @@ class CreateEventTypesTable extends Migration
             $table->increments('id');
             $table->string("name");
             $table->string("color");
-            $table->boolean("required");
-            $table->integer("count_required");
+            $table->boolean("required")->default(false);
+            $table->integer("count_required")->default(0);
             $table->timestamps();
         });
     }
