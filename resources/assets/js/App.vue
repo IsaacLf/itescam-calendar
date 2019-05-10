@@ -106,6 +106,15 @@
 import EventPicker from './components/EventPicker.vue';
 import Calendar from './components/Calendar.vue';
 import store from './store/store';
+import Swal from 'sweetalert2';
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000
+});
+
 export default {
   props: {
     eventstype: Array,
@@ -177,7 +186,7 @@ export default {
         method: 'POST',
         body: JSON.stringify({
           typeId: el.evtype,
-          name: el.name,
+          name: el.evname,
           description: el.desc,
           visible: el.show,
           startDate: el.startDate,
@@ -199,46 +208,61 @@ export default {
     },
     callApi: function () {
       let el = this;
-      fetch('/api/event')
-      .then(res => res.json())
-      .catch(err => console.error(err))
-      .then(function(res){
-        el.Events = res;
+      el.fetchEvents(el.currentPeriod)
+      .then(ready => {
         $('#addNewEvent').modal('hide');
         el.dismissData();
       })
+      // fetch('/api/event')
+      // .then(res => res.json())
+      // .catch(err => console.error(err))
+      // .then(function(res){
+      //   el.Events = res;
+      // })
     },
     dismissData: function () {
       let el = this;
       el.evtype = '';
-      el.name = '';
+      el.evname = '';
       el.desc = '';
       el.show = false;
       el.startDate = '';
       el.endDate = '';
     },
-    getCurrentEvents(period){
+    getCurrentEvents: function(period) {
+      let el = this;
+      el.currentPeriod = period;
+      el.fetchEvents(period);
+    },
+    fetchEvents: function(period) {
       let el = this;
       const start = "-08-01"; const end = "-08-31"
-      let years = period.split('-').map(year => parseInt(year));
-      fetch('/api/events/getEvents',{
-        method: 'POST',
-        body: JSON.stringify({ startDate: `${years[0]}${start}`, endDate: `${years[1]}${end}` }),
-        headers:{
-          'Content-Type': 'application/json'
-        }
+      let response = new Promise((resolve, reject) => {
+        let years = period.split('-').map(year => parseInt(year));
+        fetch('/api/events/getEvents',{
+          method: 'POST',
+          body: JSON.stringify({ startDate: `${years[0]}${start}`, endDate: `${years[1]}${end}` }),
+          headers:{
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(res => res.json())
+        .catch(err => reject(err))
+        .then(res => {
+          el.Events = res
+          resolve("ready")
+        })
       })
-      .then(res => res.json())
-      .catch(err => console.error(err))
-      .then(res => el.Events = res)
+      return response;
     }
   },
   watch: {
     evtype: function (nue, old) {
-      this.color = this.EventsType.find(item => item.id == nue).color;
+      if(nue != '')
+        this.color = this.EventsType.find(item => item.id == nue).color;
     },
     currentPeriod: function(nue, old) {
-      this.getCurrentEvents(nue);
+      this.fetchEvents(nue);
     }
   },
   components: {
