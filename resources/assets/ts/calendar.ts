@@ -659,7 +659,7 @@ namespace ITESCAM {
         }else if(evLength == 2){
           const evType1 = this.eventTypes.find(et => et.id === day.events[0].typeId);
           const evType2 = this.eventTypes.find(et => et.id === day.events[1].typeId);
-          day.color = `-moz-linear-gradient(90deg, ${evType1.color} 50%, ${evType2.color} 50%)`;
+          day.color = getTwoGradientString(evType1.color, evType2.color);
         }else if(evLength >= 3){
 
         }
@@ -695,6 +695,16 @@ namespace ITESCAM {
       });
     }
   }
+
+  function getTwoGradientString(fColor: string, sColor: string) {
+    let gradient: string;
+    gradient = `-webkit-linear-gradient(90deg, ${fColor} 50%, ${sColor} 50%); ` /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
+    gradient += `-moz-linear-gradient(90deg, ${fColor} 50%, ${sColor} 50%); ` /* For Firefox (3.6 to 15) */
+    gradient += `-o-linear-gradient(90deg, ${fColor} 50%, ${sColor} 50%); ` /* For old Opera (11.1 to 12.0) */
+    gradient += `linear-gradient(90deg, ${fColor} 50%, ${sColor} 50%);` /* Standard syntax; must be last */
+    return gradient;
+  }
+
 }
 
 export = ITESCAM

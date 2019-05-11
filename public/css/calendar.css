@@ -69,6 +69,14 @@
   font-size: 0.875rem;
 }
 
+#eventpicker.tablet button, #eventpicker.mobile button {
+  width: 5em;
+}
+
+#eventpicker.tablet [class*=modal] button, #eventpicker.mobile [class*=modal] button {
+  width: inherit;
+}
+
 #eventpicker.tablet .selectable, #eventpicker.mobile .selectable {
   transition: 0.3s;
 }
@@ -87,10 +95,6 @@
 
 .mobile h1, .tablet h1 {
   font-size: 1.75em;
-}
-
-.mobile button, .tablet button {
-  width: 5em;
 }
 
 .mobile[class*=float]#slider, .tablet[class*=float]#slider {

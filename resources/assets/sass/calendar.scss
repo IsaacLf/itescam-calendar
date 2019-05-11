@@ -80,6 +80,14 @@ $black: #000000;
       font-size: 0.875rem;
     }
 
+    button {
+      width: 5em;
+    }
+
+    [class*=modal] button {
+      width: inherit;
+    }
+
     .selectable {
       transition: 0.3s;
     }
@@ -106,9 +114,6 @@ $black: #000000;
     font-size: 1.75em;
   }
 
-  button {
-    width: 5em;
-  }
 
   &[class*=float] {
 

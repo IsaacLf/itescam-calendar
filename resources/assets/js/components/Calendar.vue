@@ -50,9 +50,8 @@
                 </thead>
                 <tbody>
                   <tr v-for="week of month.weeks" :key="week.id" class="week">
-                    <td v-for="day of week.days" :key="day.id" class="no-text-select" :style="{ background: day.color }">
+                    <td v-for="day of week.days" :key="day.id" class="no-text-select" :style="`background: ${ day.color != undefined ? day.color : '' }`">
                       {{ day.value > 0 ? day.value: "" }}
-                      <!-- day.value > 0 ? ((typeof day.events !== "undefined" && day.events.length > 0) ? day.events.length+"EV" : day.value): "" -->
                     </td>
                   </tr>
                 </tbody>

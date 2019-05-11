@@ -154,6 +154,12 @@ function selectFirstEvent(){
   let query = document.querySelector('[id="list-tab"]');
   if(query.childNodes.length > 0){
     let evSelect =  query.childNodes[0];
+    query.childNodes.forEach(child => {
+      if(child != evSelect && child.classList.contains("active") && child.classList.contains("show")){
+        child.classList.remove('active', 'show');
+        document.querySelector(`[id="${child.hash.substring(1)}"]`).classList.remove('active', 'show');
+      }
+    });
     evSelect.classList.add('active', 'show');
     document.querySelector(`[id="${evSelect.hash.substring(1)}"]`).classList.add('active', 'show');
   }

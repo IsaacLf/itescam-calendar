@@ -587,7 +587,7 @@ var ITESCAM;
                 else if (evLength == 2) {
                     var evType1 = this_1.eventTypes.find(function (et) { return et.id === day.events[0].typeId; });
                     var evType2 = this_1.eventTypes.find(function (et) { return et.id === day.events[1].typeId; });
-                    day.color = "-moz-linear-gradient(90deg, " + evType1.color + " 50%, " + evType2.color + " 50%)";
+                    day.color = getTwoGradientString(evType1.color, evType2.color);
                 }
                 else if (evLength >= 3) {
                 }
@@ -633,6 +633,14 @@ var ITESCAM;
         return Calendar;
     }());
     ITESCAM.Calendar = Calendar;
+    function getTwoGradientString(fColor, sColor) {
+        var gradient;
+        gradient = "-webkit-linear-gradient(90deg, " + fColor + " 50%, " + sColor + " 50%); "; /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
+        gradient += "-moz-linear-gradient(90deg, " + fColor + " 50%, " + sColor + " 50%); "; /* For Firefox (3.6 to 15) */
+        gradient += "-o-linear-gradient(90deg, " + fColor + " 50%, " + sColor + " 50%); "; /* For old Opera (11.1 to 12.0) */
+        gradient += "linear-gradient(90deg, " + fColor + " 50%, " + sColor + " 50%);"; /* Standard syntax; must be last */
+        return gradient;
+    }
 })(ITESCAM || (ITESCAM = {}));
 module.exports = ITESCAM;
 
