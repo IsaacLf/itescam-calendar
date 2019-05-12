@@ -635,10 +635,68 @@ namespace ITESCAM {
             if(year.value >= sy && year.value <= ey){
               cy = year.value;
               for (const month of year.months) {
-                if((month.value >= sm && cy == sy) || (month.value <= em && cy > sy && cy <= ey)){
+                if(cy == sy && sy == ey){
+                  if(month.value >= sm && month.value <= em){
+                    cm = month.value;
+                    for (const day of month.days) {
+                      if (cm == sm && sm == em){
+                        if(day.value >= sd && day.value <= ed)
+                          day.events.push(event);
+                      }
+                      else if (cm == sm && sm != em){
+                        if(day.value >= sd)
+                          day.events.push(event);
+                      }
+                      else if (cm != sm && cm == em){
+                        if(day.value <= ed)
+                          day.events.push(event);
+                      }
+                      else if(cm != sm && cm != em){
+                        day.events.push(event);
+                      }
+                    }
+                    el.updateWeeksForSheet(month);
+                  }
+                }
+                else if (cy == sy && sy != ey){
+                  if(month.value >= sm){
+                    cm = month.value;
+                    for (const day of month.days) {
+                      if (cm == sm && sm == em){
+                        if(day.value >= sd && day.value <= ed)
+                          day.events.push(event);
+                      }
+                      else if (cm == sm && sm != em){
+                        if(day.value >= sd)
+                          day.events.push(event);
+                      }
+                      else if (cm != sm && cm == em){
+                        if(day.value <= ed)
+                          day.events.push(event);
+                      }
+                      else if(cm != sm && cm != em){
+                        day.events.push(event);
+                      }
+                    }
+                    el.updateWeeksForSheet(month);
+                  }
+                }
+                else if (cy > sy && cy <= ey && month.value <= em){
                   cm = month.value;
                   for (const day of month.days) {
-                    if((day.value >= sd && cm == sm && day.value <= ed) || (day.value <= ed && cm > sm && cm <= em)){
+                    if (cm == sm && sm == em){
+                      if(day.value >= sd && day.value <= ed)
+                        day.events.push(event);
+                    }
+                    else if (cm == sm && sm != em){
+                      if(day.value >= sd)
+                        day.events.push(event);
+                    }
+                    else if (cm != sm && cm == em){
+                      if(day.value <= ed)
+                        day.events.push(event);
+                    }
+                    else if(cm != sm && cm != em){
                       day.events.push(event);
                     }
                   }
@@ -679,10 +737,68 @@ namespace ITESCAM {
             if(year.value >= sy && year.value <= ey){
               cy = year.value;
               for (const month of year.months) {
-                if((month.value >= sm && cy == sy) || (month.value <= em && cy > sy && cy <= ey)){
+                if(cy == sy && sy == ey){
+                  if(month.value >= sm && month.value <= em){
+                    cm = month.value;
+                    for (const day of month.days) {
+                      if (cm == sm && sm == em){
+                        if(day.value >= sd && day.value <= ed)
+                          day.events = [];
+                      }
+                      else if (cm == sm && sm != em){
+                        if(day.value >= sd)
+                          day.events = [];
+                      }
+                      else if (cm != sm && cm == em){
+                        if(day.value <= ed)
+                          day.events = [];
+                      }
+                      else if(cm != sm && cm != em){
+                        day.events = [];
+                      }
+                    }
+                    el.updateWeeksForSheet(month);
+                  }
+                }
+                else if (cy == sy && sy != ey){
+                  if(month.value >= sm){
+                    cm = month.value;
+                    for (const day of month.days) {
+                      if (cm == sm && sm == em){
+                        if(day.value >= sd && day.value <= ed)
+                          day.events = [];
+                      }
+                      else if (cm == sm && sm != em){
+                        if(day.value >= sd)
+                          day.events = [];
+                      }
+                      else if (cm != sm && cm == em){
+                        if(day.value <= ed)
+                          day.events = [];
+                      }
+                      else if(cm != sm && cm != em){
+                        day.events = [];
+                      }
+                    }
+                    el.updateWeeksForSheet(month);
+                  }
+                }
+                else if (cy > sy && cy <= ey && month.value <= em){
                   cm = month.value;
                   for (const day of month.days) {
-                    if((day.value >= sd && cm == sm && day.value <= ed) || (day.value <= ed && cm > sm && cm <= em)){
+                    if (cm == sm && sm == em){
+                      if(day.value >= sd && day.value <= ed)
+                        day.events = [];
+                    }
+                    else if (cm == sm && sm != em){
+                      if(day.value >= sd)
+                        day.events = [];
+                    }
+                    else if (cm != sm && cm == em){
+                      if(day.value <= ed)
+                        day.events = [];
+                    }
+                    else if(cm != sm && cm != em){
                       day.events = [];
                     }
                   }

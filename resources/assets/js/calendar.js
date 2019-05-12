@@ -561,11 +561,71 @@ var ITESCAM;
                             cy = year.value;
                             for (var _b = 0, _c = year.months; _b < _c.length; _b++) {
                                 var month = _c[_b];
-                                if ((month.value >= sm && cy == sy) || (month.value <= em && cy > sy && cy <= ey)) {
+                                if (cy == sy && sy == ey) {
+                                    if (month.value >= sm && month.value <= em) {
+                                        cm = month.value;
+                                        for (var _d = 0, _e = month.days; _d < _e.length; _d++) {
+                                            var day = _e[_d];
+                                            if (cm == sm && sm == em) {
+                                                if (day.value >= sd && day.value <= ed)
+                                                    day.events.push(event);
+                                            }
+                                            else if (cm == sm && sm != em) {
+                                                if (day.value >= sd)
+                                                    day.events.push(event);
+                                            }
+                                            else if (cm != sm && cm == em) {
+                                                if (day.value <= ed)
+                                                    day.events.push(event);
+                                            }
+                                            else if (cm != sm && cm != em) {
+                                                day.events.push(event);
+                                            }
+                                        }
+                                        el.updateWeeksForSheet(month);
+                                    }
+                                }
+                                else if (cy == sy && sy != ey) {
+                                    if (month.value >= sm) {
+                                        cm = month.value;
+                                        for (var _f = 0, _g = month.days; _f < _g.length; _f++) {
+                                            var day = _g[_f];
+                                            if (cm == sm && sm == em) {
+                                                if (day.value >= sd && day.value <= ed)
+                                                    day.events.push(event);
+                                            }
+                                            else if (cm == sm && sm != em) {
+                                                if (day.value >= sd)
+                                                    day.events.push(event);
+                                            }
+                                            else if (cm != sm && cm == em) {
+                                                if (day.value <= ed)
+                                                    day.events.push(event);
+                                            }
+                                            else if (cm != sm && cm != em) {
+                                                day.events.push(event);
+                                            }
+                                        }
+                                        el.updateWeeksForSheet(month);
+                                    }
+                                }
+                                else if (cy > sy && cy <= ey && month.value <= em) {
                                     cm = month.value;
-                                    for (var _d = 0, _e = month.days; _d < _e.length; _d++) {
-                                        var day = _e[_d];
-                                        if ((day.value >= sd && cm == sm && day.value <= ed) || (day.value <= ed && cm > sm && cm <= em)) {
+                                    for (var _h = 0, _j = month.days; _h < _j.length; _h++) {
+                                        var day = _j[_h];
+                                        if (cm == sm && sm == em) {
+                                            if (day.value >= sd && day.value <= ed)
+                                                day.events.push(event);
+                                        }
+                                        else if (cm == sm && sm != em) {
+                                            if (day.value >= sd)
+                                                day.events.push(event);
+                                        }
+                                        else if (cm != sm && cm == em) {
+                                            if (day.value <= ed)
+                                                day.events.push(event);
+                                        }
+                                        else if (cm != sm && cm != em) {
                                             day.events.push(event);
                                         }
                                     }
@@ -614,11 +674,71 @@ var ITESCAM;
                             cy = year.value;
                             for (var _b = 0, _c = year.months; _b < _c.length; _b++) {
                                 var month = _c[_b];
-                                if ((month.value >= sm && cy == sy) || (month.value <= em && cy > sy && cy <= ey)) {
+                                if (cy == sy && sy == ey) {
+                                    if (month.value >= sm && month.value <= em) {
+                                        cm = month.value;
+                                        for (var _d = 0, _e = month.days; _d < _e.length; _d++) {
+                                            var day = _e[_d];
+                                            if (cm == sm && sm == em) {
+                                                if (day.value >= sd && day.value <= ed)
+                                                    day.events = [];
+                                            }
+                                            else if (cm == sm && sm != em) {
+                                                if (day.value >= sd)
+                                                    day.events = [];
+                                            }
+                                            else if (cm != sm && cm == em) {
+                                                if (day.value <= ed)
+                                                    day.events = [];
+                                            }
+                                            else if (cm != sm && cm != em) {
+                                                day.events = [];
+                                            }
+                                        }
+                                        el.updateWeeksForSheet(month);
+                                    }
+                                }
+                                else if (cy == sy && sy != ey) {
+                                    if (month.value >= sm) {
+                                        cm = month.value;
+                                        for (var _f = 0, _g = month.days; _f < _g.length; _f++) {
+                                            var day = _g[_f];
+                                            if (cm == sm && sm == em) {
+                                                if (day.value >= sd && day.value <= ed)
+                                                    day.events = [];
+                                            }
+                                            else if (cm == sm && sm != em) {
+                                                if (day.value >= sd)
+                                                    day.events = [];
+                                            }
+                                            else if (cm != sm && cm == em) {
+                                                if (day.value <= ed)
+                                                    day.events = [];
+                                            }
+                                            else if (cm != sm && cm != em) {
+                                                day.events = [];
+                                            }
+                                        }
+                                        el.updateWeeksForSheet(month);
+                                    }
+                                }
+                                else if (cy > sy && cy <= ey && month.value <= em) {
                                     cm = month.value;
-                                    for (var _d = 0, _e = month.days; _d < _e.length; _d++) {
-                                        var day = _e[_d];
-                                        if ((day.value >= sd && cm == sm && day.value <= ed) || (day.value <= ed && cm > sm && cm <= em)) {
+                                    for (var _h = 0, _j = month.days; _h < _j.length; _h++) {
+                                        var day = _j[_h];
+                                        if (cm == sm && sm == em) {
+                                            if (day.value >= sd && day.value <= ed)
+                                                day.events = [];
+                                        }
+                                        else if (cm == sm && sm != em) {
+                                            if (day.value >= sd)
+                                                day.events = [];
+                                        }
+                                        else if (cm != sm && cm == em) {
+                                            if (day.value <= ed)
+                                                day.events = [];
+                                        }
+                                        else if (cm != sm && cm != em) {
                                             day.events = [];
                                         }
                                     }
