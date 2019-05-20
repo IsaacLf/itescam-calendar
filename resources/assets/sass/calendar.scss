@@ -2,6 +2,12 @@
 $blue: #007bff;
 $black: #000000;
 
+.header {
+  text-transform: capitalize;
+  text-align: center;
+  font-size: 18px;
+}
+
 #calendar,
 #eventpicker {
 
@@ -16,7 +22,7 @@ $black: #000000;
   &.desktop,
   &.laptop {
     display: grid;
-    grid-gap: 1em;
+    grid-gap: 0.5em;
     grid-template-columns: 24% 72%;
     justify-content: center;
     margin-bottom: 2em;

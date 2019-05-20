@@ -3,7 +3,6 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import App from './App.vue';
 import VueMq from 'vue-mq';
 
 Vue.use(VueMq, {
@@ -16,17 +15,6 @@ Vue.use(VueMq, {
 })
 
 library.add(fas, fab)
-Vue.component('app', require('./App.vue'));
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 Vue.config.productionTip = false
-
-const app = new Vue({
-  el: '#app',
-  store,
-});
-
-
-$(document).ready(function () {
-  $('.evtype').selectpicker();
-});

@@ -8,7 +8,7 @@
       <font-awesome-icon v-show="toggled" class="icon" icon="angle-double-left"/>
       <font-awesome-icon v-show="!toggled" class="icon" icon="angle-double-right"/>
     </a>
-    <h1 class="title non-user-select">Referencia de eventos</h1>
+    <h3 class="title non-user-select">Referencia de eventos</h3>
     <table id="events" style="width: 100%; padding-right: 1em;">
       <tbody>
         <tr v-for="item of EventsType" :key="item.id" @click="select(item.id)" class="selectable">

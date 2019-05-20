@@ -21,5 +21,7 @@ elixir((mix) => {
        .typescript('./resources/assets/ts/calendar.ts', './resources/assets/js', null, { 'lib': ['es6', 'dom'] })
        .webpack('app.js')
        .webpack('calendario.js')
+       .webpack('frontend.js')
+       .webpack('backend.js')
        ;
 });
