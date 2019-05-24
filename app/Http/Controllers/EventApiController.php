@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Event as Event;
+use App\EventType as EventType;
 
 class EventApiController extends Controller
 {
@@ -31,7 +33,6 @@ class EventApiController extends Controller
         $event->typeId = $request->typeId;
         $event->name = $request->name;
         $event->description = $request->description;
-        $event->visible = $request->visible;
         $event->startDate = $request->startDate;
         $event->endDate = $request->endDate;
         if($event->save()){
@@ -86,11 +87,23 @@ class EventApiController extends Controller
 
       $startDate = $request->startDate;
       $endDate = $request->endDate;
+      $eventTypesIds = []; $eventTypes;
 
-      $events = DB::table("events")->where([
+      if(Auth::check())
+        $eventTypes = EventType::byUser();
+      else
+        $eventTypes = EventType::getOnlyOfficials();
+
+      foreach($eventTypes as $evtype){
+        array_push($eventTypesIds, $evtype->id);
+      }
+
+      $events = Event::where([
         ['startDate','>=', $startDate],
         ['endDate','<=', $endDate]
-      ])->get();
+      ])
+      ->whereIn('typeId', $eventTypesIds)
+      ->get();
 
       return response()->json($events);
 

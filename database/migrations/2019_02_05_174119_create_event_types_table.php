@@ -13,14 +13,15 @@ class CreateEventTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('event_types', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string("name");
-            $table->string("color");
-            $table->boolean("required")->default(false);
-            $table->integer("count_required")->default(0);
-            $table->timestamps();
-        });
+      Schema::create('event_types', function (Blueprint $table) {
+        $table->increments('id');
+        $table->string("name");
+        $table->string("color");
+        $table->integer('classification_id')->default(1);
+        $table->boolean("required")->default(false);
+        $table->integer("count_required")->default(0);
+        $table->timestamps();
+      });
     }
 
     /**
@@ -30,6 +31,6 @@ class CreateEventTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('event_types');
+      Schema::dropIfExists('event_types');
     }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="event-picker-container">
-    <a @click="[ user.admin ? slideEvTypes() : displayEvTypes() ]"
+    <a @click="[ true ? slideEvTypes() : displayEvTypes() ]"
       :class="$mq"
       id="slider"
       draggable="false"
@@ -9,24 +9,26 @@
       <font-awesome-icon v-show="!toggled" class="icon" icon="angle-double-right"/>
     </a>
     <h3 class="title non-user-select">Referencia de eventos</h3>
-    <table id="events" style="width: 100%; padding-right: 1em;">
-      <tbody>
-        <tr v-for="item of EventsType" :key="item.id" @click="select(item.id)" class="selectable">
-          <td width="20%" class="text-center" style="">
-            <canvas width="20px" height="20px" style="border: 2px solid #090B10;" v-bind:style="{ background: item.color }"></canvas>
-          </td>
-          <td width="65%" style="font-variant: small-caps;">
-            {{ item.name }}
-          </td>
-          <td width="20%" style="color: #04f06a;" class="text-center">
-            <font-awesome-icon icon="check-square" v-show="selected == item.id"/>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div id="wrapper">
+      <table id="events" style="width: 100%; padding-right: 1em; margin: -1px;">
+        <tbody>
+          <tr v-for="item of EventsType" :key="item.id" @click="select(item.id)" class="selectable">
+            <td width="20%" class="text-center" style="">
+              <canvas width="20px" height="20px" style="border: 2px solid #FFFFFF;" v-bind:style="{ background: item.color }"></canvas>
+            </td>
+            <td width="65%" style="font-variant: small-caps;">
+              {{ item.name }}
+            </td>
+            <td width="20%" style="color: #04f06a;" class="text-center">
+              <font-awesome-icon icon="check-square" v-show="selected == item.id && canEditEventTypes"/>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div class="buttons-container">
       <div class="btn-group" role="group" aria-label="Events buttons">
-        <button @click="addNewEventType()" class="btn btn-sm btn-danger" type="button" data-toggle="modal" data-target="#typeEventPick">
+        <button @click="addNewEventType()" class="btn btn-sm btn-danger" :disabled="!canCreateEventTypes" type="button" data-toggle="modal" data-target="#typeEventPick">
           <span>
             <font-awesome-icon :icon="['fab','elementor']"/>
           </span>
@@ -36,7 +38,7 @@
           <font-awesome-icon icon="calendar-week"/>
           {{ !($mq == 'mobile'||$mq=='tablet') ? 'Eventos' : ''}}
         </button>
-        <button @click="editSelected()" class="btn btn-sm btn-success" type="button" data-toggle="modal" data-target="#typeEventPick">
+        <button @click="editSelected()" class="btn btn-sm btn-success" :disabled="!canEditEventTypes" type="button" data-toggle="modal" data-target="#typeEventPick">
           <font-awesome-icon icon="edit"/>
           {{ !($mq == 'mobile'||$mq=='tablet') ? 'Editar' : ''}}
         </button>
@@ -58,9 +60,32 @@
                 <label for="eventName">Nombre: </label>
                 <input type="text" class="form-control" id="eventName" placeholder="Nombre del evento" v-model="ETName">
               </div>
-              <div class="form-group mb-2 ml-3">
+              <div class="form-group mb-3 ml-3">
                 <label for="colorPick">Color: </label>
                 <sketch-picker id="colorPick" v-model="colors"></sketch-picker>
+              </div>
+              <div class="form-group mt-4 ml-3" id="classId">
+                <label for="classifId">Clasificación</label>
+                <select class="form-control" name="cassifs" id="classifs" v-model="classificationId">
+                  <option value="0" disabled selected>Seleccione una opcion</option>
+                  <option v-for="classif of classifs" :key="classif.id" :value="classif.id" style="text-transform: capitalize;">
+                    {{ classif.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="col align-self-center ml-3">
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="evtypeRequired" v-model="ETRequired">
+                    <label class="custom-control-label" for="evtypeRequired">Requerido</label>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group mx-sm-3 mb-2">
+                    <label for="eventName">Número requerido: </label>
+                    <input type="number" min="0" class="form-control" id="countRequired" v-model="ETCountRequired">
+                  </div>
+                </div>
               </div>
             </form>
           </div>
@@ -142,6 +167,7 @@ import Swal from 'sweetalert2';
 import { Sketch } from 'vue-color';
 import store from '../store/store';
 import { setTimeout } from 'timers';
+import { User } from '../calendar';
 
 const Toast = Swal.mixin({
   toast: true,
@@ -169,6 +195,7 @@ export default {
   props: {
     eventstype: Array,
     events: Array,
+    classifs: Array,
     user: Object
   },
   data: function () {
@@ -177,6 +204,9 @@ export default {
       eSelected: 0,
       colors: '#090B10',
       ETName: '',
+      ETRequired: false,
+      ETCountRequired: 0,
+      classificationId: 1,
       modText: 'Agregar nuevo tipo de evento',
       eventTArray: [],
       eventArray: [],
@@ -278,7 +308,21 @@ export default {
       set: function(val) {
         this.edit = val;
       }
+    },
+    /** Start Permission Props*/
+    canEditEventTypes: function () {
+      let el = this;
+      if(el.user instanceof User)
+        return el.user.canEditEventTypes();
+      return false;
+    },
+    canCreateEventTypes: function () {
+      let el = this;
+      if(el.user instanceof User)
+        return el.user.canCreateEventTypes();
+      return false;
     }
+    /** End Permission Props*/
   },
   methods:{
     refreshEventsType: function(){
@@ -294,6 +338,9 @@ export default {
       this.modalText = 'Agregar nuevo tipo de evento';
       this.colors = '#090B10';
       this.ETName = '';
+      this.ETRequired = false;
+      this.ETCountRequired = 0;
+      this.classificationId = 1;
     },
     addNewEventType: function() {
       this.dismissData();
@@ -321,14 +368,21 @@ export default {
       let selectedEvent = el.EventsType.find(item => el.selected == item.id);
       this.colors = selectedEvent.color;
       this.ETName = selectedEvent.name;
+      this.ETRequired = selectedEvent.required;
+      this.ETCountRequired = selectedEvent['count_required'];
+      this.classificationId = selectedEvent.classification.id;
     },
     saveNew: function () {
       let el = this;
-      fetch('/api/eventType',{
+      fetch('/eventType',{
         method: 'POST',
+        credentials: "same-origin",
         body: JSON.stringify({
           name: el.ETName,
-          color: el.colors.hex != undefined ? el.colors.hex : el.colors
+          color: el.colors.hex != undefined ? el.colors.hex : el.colors,
+          required: el.ETRequired,
+          count: el.ETCountRequired,
+          classificationId: el.classificationId
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -346,11 +400,15 @@ export default {
     },
     updateEl: function () {
       let el = this;
-      fetch(`/api/eventType/${el.selected}`,{
+      fetch(`/eventType/${el.selected}`,{
         method: 'PUT',
+        credentials: "same-origin",
         body: JSON.stringify({
           name: el.ETName,
-          color: el.colors.hex != undefined ? el.colors.hex : el.colors
+          color: el.colors.hex != undefined ? el.colors.hex : el.colors,
+          required: el.ETRequired,
+          count: el.ETCountRequired,
+          classificationId: el.classificationId
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -384,8 +442,9 @@ export default {
         reverseButtons: true
       }).then((result) => {
         if (result.value) {
-          fetch(`/api/eventType/${el.selected}`,{
+          fetch(`/eventType/${el.selected}`,{
             method: 'DELETE',
+            credentials: "same-origin"
           })
           .then(res => res.json())
           .catch(err => console.error(err))
@@ -403,7 +462,7 @@ export default {
     },
     callApi: function () {
       let el = this;
-      fetch('/api/eventType')
+      fetch('/eventType')
       .then(res => res.json())
       .catch(err => console.error(err))
       .then(function(res){
@@ -445,9 +504,11 @@ export default {
 </script>
 
 <style scoped>
+
   * {
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   }
+
   canvas {
     padding-left: 0;
     padding-right: 0;
@@ -456,6 +517,10 @@ export default {
     margin-top: 0.35em;
     margin-bottom: 0.35em;
     display: block;
+  }
+
+  #wrapper {
+    width: 100%;
   }
 
   .event-picker-container {
@@ -491,9 +556,47 @@ export default {
     cursor: pointer;
   }
 
+  #colorPick {
+    margin: 0 auto;
+  }
+
+  #classifs {
+    text-transform: capitalize;
+  }
+
+  #events tr {
+    display: flex;
+    align-items: center;
+  }
+
   #events tr:hover {
     background-color: rgba(50, 50, 50, 0.5);
     border-radius: 10px;
+  }
+
+  #events tbody {
+    display: block;
+    height: 409px;
+    overflow: auto;
+  }
+
+  #events tbody::-webkit-scrollbar {
+    width: 12px;
+    background-color: #559;
+  }
+
+  #events tbody::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #559;
+    /* border: solid 3px transparent; */
+  }
+
+  #events tbody::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #2c3e50;
+    /* border: solid 3px transparent; */
   }
 
   .buttons-container {

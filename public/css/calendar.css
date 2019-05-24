@@ -89,6 +89,7 @@
 
 #eventpicker.tablet table#events, #eventpicker.mobile table#events {
   width: 300px !important;
+  margin: -2px !important;
 }
 
 #eventpicker.tablet .title, #eventpicker.mobile .title {
@@ -99,8 +100,18 @@
   width: 100% !important;
 }
 
+@media screen and (orientation: landscape) {
+  #eventpicker.tablet #events tbody, #eventpicker.mobile #events tbody {
+    height: 190px !important;
+  }
+}
+
 .mobile h1, .tablet h1 {
   font-size: 1.75em;
+}
+
+.mobile #configs, .tablet #configs {
+  padding-bottom: 0.5em;
 }
 
 .mobile[class*=float]#slider, .tablet[class*=float]#slider {

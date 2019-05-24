@@ -64,9 +64,7 @@ namespace ITESCAM {
     typeId: number;
     startDate?: MDate | string;
     endDate?: MDate | string;
-    important?: boolean;
-    iconPath?: string;
-    url?: string;
+    status: Status;
     description?: string;
   }
 
@@ -74,7 +72,26 @@ namespace ITESCAM {
     id: number;
     name: string;
     color: string;
+    classification: Classification;
     required?: boolean;
+    'count_required'?: boolean;
+  }
+
+  export interface Classification {
+    id: number;
+    name: string;
+  }
+
+  const enum ETClassification {
+    OFFICIAL  = 1,
+    AREA      = 2,
+    ACADEMIC  = 3
+  }
+
+  const enum Status {
+    PENDING   = 1,
+    APPROVED  = 2,
+    PUBLISHED = 3
   }
 
   export class MDate {
@@ -612,7 +629,8 @@ namespace ITESCAM {
             name: event.name,
             typeId: event.typeId,
             startDate: new MDate(sdA[2], sdA[1], sdA[0]),
-            endDate: new MDate(edA[2], edA[1], edA[0])
+            endDate: new MDate(edA[2], edA[1], edA[0]),
+            status: event.status
           })
         }
       });
@@ -714,12 +732,10 @@ namespace ITESCAM {
         if(evLength == 1){
           const evType = this.eventTypes.find(et => et.id === day.events[0].typeId);
           day.color = evType.color;
-        }else if(evLength == 2){
+        }else if(evLength >= 2){
           const evType1 = this.eventTypes.find(et => et.id === day.events[0].typeId);
           const evType2 = this.eventTypes.find(et => et.id === day.events[1].typeId);
           day.color = getTwoGradientString(evType1.color, evType2.color);
-        }else if(evLength >= 3){
-
         }
       }
       let weeks: Week[] = this.getWeeksForCalendar(month.days);
@@ -819,6 +835,81 @@ namespace ITESCAM {
     gradient += `-o-linear-gradient(90deg, ${fColor} 50%, ${sColor} 50%); ` /* For old Opera (11.1 to 12.0) */
     gradient += `linear-gradient(90deg, ${fColor} 50%, ${sColor} 50%);` /* Standard syntax; must be last */
     return gradient;
+  }
+
+  const enum Tasks {
+    CREATE_OFFICIAL_EVENTS = 1,
+    CREATE_AREA_EVENTS     = 2,
+    CREATE_ACADEMIC_EVENTS = 3,
+    CREATE_EVENT_TYPES     = 4,
+    EDIT_EVENT_TYPES       = 5,
+    DELETE_EVENT_TYPES     = 6,
+    EDIT_EVENTS            = 7,
+    DELETE_EVENTS          = 8,
+    APPROVE_EVENTS         = 9,
+    PUBLISH                = 10
+  }
+
+  export interface User {
+    id: number;
+    name: string;
+    email: string;
+    role: Role;
+  }
+
+  export interface Role {
+    id: number;
+    name: string;
+    tasks: Task[];
+  }
+
+  export interface Task {
+    id: number;
+    description: string;
+  }
+
+  export class User {
+
+    private user: User;
+
+    constructor(user: User) {
+      this.user = user;
+    }
+
+    setUser(user: User) {
+      this.user = user;
+    }
+
+    canCreateOfficialEvents(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.CREATE_OFFICIAL_EVENTS);
+    }
+    canCreateAreaEvents(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.CREATE_AREA_EVENTS);
+    }
+    canCreateAcademicEvents(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.CREATE_ACADEMIC_EVENTS);
+    }
+    canCreateEventTypes(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.CREATE_EVENT_TYPES);
+    }
+    canEditEventTypes(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.EDIT_EVENT_TYPES);
+    }
+    canDeleteEventTypes(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.DELETE_EVENT_TYPES);
+    }
+    canEditEvents(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.EDIT_EVENTS);
+    }
+    canDeleteEvents(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.DELETE_EVENTS);
+    }
+    canApproveEvents(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.APPROVE_EVENTS);
+    }
+    canPublish(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.PUBLISH);
+    }
   }
 
 }

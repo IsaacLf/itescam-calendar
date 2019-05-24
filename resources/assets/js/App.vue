@@ -1,10 +1,35 @@
 <template>
 <div>
-  <header class="header" :class="$mq">
-    <h1>Calendario ITESCAM</h1>
+  <header class="header" :class="$mq" style="display: block;">
+    <div class="row" style="margin: 0;">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+        <h1>Calendario ITESCAM</h1>
+      </div>
+      <div id="configs" class="col-md-2" style="display: flex;align-items: center; justify-content: center;">
+        <!-- Aquí van los componentes para configurar la fecha del calendario que se publicará -->
+        <div class="dropdown dropleft">
+          <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <font-awesome-icon class="icon" icon="cogs"/>
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <h6 class="dropdown-header">Acciones</h6>
+            <a  class="dropdown-item" :class="{ disabled: !canPublish || publishedPeriod == currentPeriod }"
+                @click="publishCurrentCalendar"
+                href="javascript:void(0)">Marcar 'activo' este calendario
+            </a>
+            <a  class="dropdown-item" :class="{ disabled: !canPublish }"
+                href="javascript:void(0)">Publicar eventos de este ciclo
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item disabled" href="javascript:void(0)">Activo: {{ publishedPeriod }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </header>
   <!-- Button trigger modal -->
-  <a v-if="User.admin" id="addEvent" href="javascript:void(0)" role="button" class="float" :class="$mq" title="Añadir evento" data-toggle="modal" data-target="#addNewEvent">
+  <a v-if="canCreateEvents" id="addEvent" href="javascript:void(0)" role="button" class="float" :class="$mq" title="Añadir evento" data-toggle="modal" data-target="#addNewEvent">
     <font-awesome-icon class="icon" icon="calendar-plus"/>
   </a>
 
@@ -14,6 +39,7 @@
       v-bind:eventstype="EventsType"
       v-bind:events="Events"
       v-bind:user="User"
+      v-bind:classifs="classifs"
       v-on:eventsChange="updateEvents"
       v-on:eventsTChange="updateEventsType"
     ></event-picker>
@@ -22,7 +48,8 @@
       <calendar
         v-bind:eventstype="EventsType"
         v-bind:events="Events"
-        v-bind:current="currentPeriod"
+        v-bind:current="publishedPeriod"
+        v-bind:isadmin="isadmin"
         v-on:changeCalendar="getCurrentEvents"
       ></calendar>
     </div>
@@ -39,14 +66,6 @@
             </button>
         </div>
         <div class="modal-body">
-          <!--
-          $table->integer('typeId');
-          $table->string('name")->nullable();
-          $table->text('description');
-          $table->boolean('visible');
-          $table->date('startDate');
-          $table->date('endDate')->nullable();
-          -->
           <form>
             <div class="row">
               <div class="col-6 form-group">
@@ -107,6 +126,7 @@ import EventPicker from './components/EventPicker.vue';
 import Calendar from './components/Calendar.vue';
 import store from './store/store';
 import Swal from 'sweetalert2';
+import { User } from './calendar';
 
 const Toast = Swal.mixin({
   toast: true,
@@ -118,18 +138,19 @@ const Toast = Swal.mixin({
 export default {
   props: {
     eventstype: Array,
-    // events: Array,
-    currentperiod: String
+    classifs: Array,
+    published: String,
+    currentperiod: String,
+    isadmin: Number,
+    userid: Number
   },
   data: function () {
     return {
       eventss: [],
       eventsstype: [],
-      user: { //This will be a prop
-        name: "Nose",
-        admin: true
-      },
-      currentPeriod: '', //This will also be a prop
+      currentPeriod: '',
+      user: {},
+      publishedPeriod: '',
       evname: '',
       evtype: '',
       color: '#FFFFFF',
@@ -140,10 +161,20 @@ export default {
     }
   },
   created: function(){
-    // this.Events = this.events;
-    this.currentPeriod = this.currentperiod;
-    this.Events = [];
-    this.EventsType = this.eventstype;
+    let el = this;
+    el.currentPeriod = el.currentperiod;
+    el.publishedPeriod = el.published;
+    el.Events = [];
+    el.EventsType = el.eventstype;
+    fetch(`/user/${el.userid}`, {
+      method: 'GET',
+      credentials: "same-origin"
+    })
+    .then(res => res.json())
+    .catch(err => console.error(err))
+    .then(user => {
+      el.User = new User(user);
+    });
   },
   computed: {
     Events: {
@@ -169,7 +200,23 @@ export default {
       get: function() {
         return this.user;
       }
+    },
+    /** Start Permission Props */
+    canCreateEvents: function() {
+      let el = this;
+      if(el.User instanceof User)
+        return el.User.canCreateOfficialEvents()
+               || el.User.canCreateAreaEvents()
+               || el.User.canCreateAcademicEvents();
+      return false;
+    },
+    canPublish: function() {
+      let el = this;
+      if(el.User instanceof User)
+        return el.User.canPublish();
+      return false;
     }
+    /** End Permission Props */
   },
   methods: {
     updateEvents: function (value){
@@ -182,8 +229,9 @@ export default {
     },
     saveNewEv: function () {
       let el = this;
-      fetch('/api/event',{
+      fetch('/event',{
         method: 'POST',
+        credentials: "same-origin",
         body: JSON.stringify({
           typeId: el.evtype,
           name: el.evname,
@@ -213,12 +261,6 @@ export default {
         $('#addNewEvent').modal('hide');
         el.dismissData();
       })
-      // fetch('/api/event')
-      // .then(res => res.json())
-      // .catch(err => console.error(err))
-      // .then(function(res){
-      //   el.Events = res;
-      // })
     },
     dismissData: function () {
       let el = this;
@@ -239,8 +281,9 @@ export default {
       const start = "-08-01"; const end = "-08-31"
       let response = new Promise((resolve, reject) => {
         let years = period.split('-').map(year => parseInt(year));
-        fetch('/api/events/getEvents',{
+        fetch('/events/getEvents',{
           method: 'POST',
+          credentials: "same-origin",
           body: JSON.stringify({ startDate: `${years[0]}${start}`, endDate: `${years[1]}${end}` }),
           headers:{
             'Content-Type': 'application/json'
@@ -254,7 +297,38 @@ export default {
         })
       })
       return response;
+    },
+    publishCurrentCalendar: function() {
+      let el = this;
+      fetch('/configuration/publishCalendar',{
+        method: 'POST',
+        credentials: "same-origin",
+        body: JSON.stringify({
+          activeCalendar: el.currentPeriod
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .catch(err => console.error(err))
+      .then(res => {
+        if(res.status == 200) {
+          Toast.fire({
+            type: 'success',
+            title: 'Publicado correctamente'
+          })
+          el.publishedPeriod = res.activeCalendar
+        } else {
+          Toast.fire({
+            type: 'error',
+            title: 'Hubo un error inesperado'
+          })
+        }
+      })
+
     }
+
   },
   watch: {
     evtype: function (nue, old) {

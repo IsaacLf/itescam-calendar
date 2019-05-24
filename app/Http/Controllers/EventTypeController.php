@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\EventType as EventType;
 
@@ -14,7 +15,7 @@ class EventTypeController extends Controller
      */
     public function index()
     {
-        return EventType::all();
+      return Auth::check() ? EventType::byUser() : EventType::getOnlyOfficials();
     }
 
     /**
@@ -38,6 +39,9 @@ class EventTypeController extends Controller
         $eventT = new EventType();
         $eventT->name = $request->name;
         $eventT->color = $request->color;
+        $eventT->required= $request->required;
+        $eventT->count_required = $request->count;
+        $eventT->classification_id = $request->classificationId;
         if($eventT->save()){
           return response()->json([
             'status' => 200,
@@ -84,6 +88,9 @@ class EventTypeController extends Controller
         $eventT = EventType::findOrFail($id);
         $eventT->name = $request->name;
         $eventT->color = $request->color;
+        $eventT->required= $request->required;
+        $eventT->count_required = $request->count;
+        $eventT->classification_id = $request->classificationId;
         if($eventT->save()){
           return response()->json([
             'status' => 200,

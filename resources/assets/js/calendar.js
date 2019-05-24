@@ -536,7 +536,8 @@ var ITESCAM;
                         name: event.name,
                         typeId: event.typeId,
                         startDate: new MDate(sdA[2], sdA[1], sdA[0]),
-                        endDate: new MDate(edA[2], edA[1], edA[0])
+                        endDate: new MDate(edA[2], edA[1], edA[0]),
+                        status: event.status
                     });
                 }
             });
@@ -644,12 +645,10 @@ var ITESCAM;
                     var evType = this_1.eventTypes.find(function (et) { return et.id === day.events[0].typeId; });
                     day.color = evType.color;
                 }
-                else if (evLength == 2) {
+                else if (evLength >= 2) {
                     var evType1 = this_1.eventTypes.find(function (et) { return et.id === day.events[0].typeId; });
                     var evType2 = this_1.eventTypes.find(function (et) { return et.id === day.events[1].typeId; });
                     day.color = getTwoGradientString(evType1.color, evType2.color);
-                }
-                else if (evLength >= 3) {
                 }
             };
             var this_1 = this;
@@ -761,6 +760,46 @@ var ITESCAM;
         gradient += "linear-gradient(90deg, " + fColor + " 50%, " + sColor + " 50%);"; /* Standard syntax; must be last */
         return gradient;
     }
+    var User = /** @class */ (function () {
+        function User(user) {
+            this.user = user;
+        }
+        User.prototype.setUser = function (user) {
+            this.user = user;
+        };
+        User.prototype.canCreateOfficialEvents = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(1 /* CREATE_OFFICIAL_EVENTS */);
+        };
+        User.prototype.canCreateAreaEvents = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(2 /* CREATE_AREA_EVENTS */);
+        };
+        User.prototype.canCreateAcademicEvents = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(3 /* CREATE_ACADEMIC_EVENTS */);
+        };
+        User.prototype.canCreateEventTypes = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(4 /* CREATE_EVENT_TYPES */);
+        };
+        User.prototype.canEditEventTypes = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(5 /* EDIT_EVENT_TYPES */);
+        };
+        User.prototype.canDeleteEventTypes = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(6 /* DELETE_EVENT_TYPES */);
+        };
+        User.prototype.canEditEvents = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(7 /* EDIT_EVENTS */);
+        };
+        User.prototype.canDeleteEvents = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(8 /* DELETE_EVENTS */);
+        };
+        User.prototype.canApproveEvents = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(9 /* APPROVE_EVENTS */);
+        };
+        User.prototype.canPublish = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(10 /* PUBLISH */);
+        };
+        return User;
+    }());
+    ITESCAM.User = User;
 })(ITESCAM || (ITESCAM = {}));
 module.exports = ITESCAM;
 

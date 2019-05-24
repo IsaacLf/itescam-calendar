@@ -18,7 +18,7 @@ elixir((mix) => {
     mix.sass('app.scss')
        .sass('calendar.scss')
        .styles('./node_modules/bootstrap-vue/dist/bootstrap-vue', 'public/css/calendar.css')
-       .typescript('./resources/assets/ts/calendar.ts', './resources/assets/js', null, { 'lib': ['es6', 'dom'] })
+       .typescript('./resources/assets/ts/calendar.ts', './resources/assets/js', null, { 'lib': ['es6', 'dom', 'es2017'] })
        .webpack('app.js')
        .webpack('calendario.js')
        .webpack('frontend.js')

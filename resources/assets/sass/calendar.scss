@@ -100,6 +100,7 @@ $black: #000000;
 
     table#events {
       width: 300px !important;
+      margin: -2px !important;
     }
 
     .title {
@@ -114,12 +115,26 @@ $black: #000000;
 
 }
 
+@media screen and (orientation: landscape) {
+  #eventpicker {
+    &.tablet,
+    &.mobile {
+      #events tbody {
+        height: 190px !important;
+      }
+    }
+  }
+}
+
 .mobile, .tablet {
 
   h1 {
     font-size: 1.75em;
   }
 
+  #configs {
+    padding-bottom: 0.5em;
+  }
 
   &[class*=float] {
 

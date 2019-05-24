@@ -9,21 +9,23 @@
       <font-awesome-icon v-show="!toggled" class="icon" icon="angle-double-right"/>
     </a>
     <!-- <h3 class="title non-user-select">Referencia de eventos</h3> -->
-    <table id="events" style="width: 100%; padding-right: 1em;">
-      <tbody>
-        <tr v-for="item of EventsType" :key="item.id" @click="select(item.id)" class="selectable">
-          <td width="20%" class="text-center" style="">
-            <canvas width="20px" height="20px" style="border: 2px solid #090B10;" v-bind:style="{ background: item.color }"></canvas>
-          </td>
-          <td width="65%" style="font-variant: small-caps;">
-            {{ item.name }}
-          </td>
-          <td width="20%" style="color: #04f06a;" class="text-center">
-            <!-- <font-awesome-icon icon="check-square" v-show="selected == item.id"/> -->
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div id="wrapper">
+      <table id="events" style="width: 100%; padding-right: 1em;margin: -1px;">
+        <tbody>
+          <tr v-for="item of EventsType" :key="item.id" @click="select(item.id)" class="selectable">
+            <td width="20%" class="text-center" style="">
+              <canvas width="20px" height="20px" style="border: 2px solid #FFFFFF;" v-bind:style="{ background: item.color }"></canvas>
+            </td>
+            <td width="65%" style="font-variant: small-caps;">
+              {{ item.name }}
+            </td>
+            <td width="20%" style="color: #04f06a;" class="text-center">
+              <!-- <font-awesome-icon icon="check-square" v-show="selected == item.id"/> -->
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <!-- Modal TIPO de EVENTO -->
     <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="EventModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
@@ -256,9 +258,11 @@ export default {
 </script>
 
 <style scoped>
+
   * {
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   }
+
   canvas {
     padding-left: 0;
     padding-right: 0;
@@ -267,6 +271,11 @@ export default {
     margin-top: 0.35em;
     margin-bottom: 0.35em;
     display: block;
+  }
+
+  #wrapper {
+    width: 100%;
+    margin-top: 6em;
   }
 
   .event-picker-container {
@@ -302,13 +311,39 @@ export default {
     cursor: pointer;
   }
 
-  #events {
-    margin-top: 6em;
+  #events tr {
+    display: flex;
+    align-items: center;
   }
 
   #events tr:hover {
     background-color: rgba(50, 50, 50, 0.5);
     border-radius: 10px;
+  }
+
+  #events tbody {
+    display: block;
+    height: 409px;
+    overflow: auto;
+  }
+
+  #events tbody::-webkit-scrollbar {
+    width: 12px;
+    background-color: #559;
+  }
+
+  #events tbody::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #559;
+    /* border: solid 3px transparent; */
+  }
+
+  #events tbody::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #2c3e50;
+    /* border: solid 3px transparent; */
   }
 
   .buttons-container {

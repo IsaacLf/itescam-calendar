@@ -12,11 +12,35 @@
 <link rel="stylesheet" href="{{ asset('css/calendar.css') }}">
 @endsection
 
+@php
+  $eventtypes = [];
+  $hasuser = 0;
+  $userid = 1;
+  if(Auth::check()) {
+    $eventtypes = App\EventType::byUser();
+    $hasuser = 1;
+    $userid = Auth::id();
+  }
+  else {
+    $eventtypes = App\EventType::getOnlyOfficials();
+    $hasuser = 0;
+  }
+@endphp
+
 @section('content')
-<!-- v-bind:events="{{ App\Event::all() }}" -->
+@if($hasuser)
+<form action="{{ url('logout') }}" method="post">
+  {{ csrf_field() }}
+  <button type="submit">LOGOUT</button>
+</form>
+@endif
 <app
-  v-bind:eventstype="{{ App\EventType::all() }}"
-  v-bind:currentperiod="'{{ App\Configuration::all()[0]->activeCalendar }}'"
+  v-bind:eventstype="{{ $eventtypes }}"
+  v-bind:classifs="{{ App\Classification::all() }}"
+  v-bind:currentperiod="'{{ $currentPeriod }}'"
+  v-bind:published="'{{ $currentPeriod }}'"
+  v-bind:isadmin="{{ $hasuser }}"
+  v-bind:userid="{{ $userid }}"
 ></app>
 @endsection
 

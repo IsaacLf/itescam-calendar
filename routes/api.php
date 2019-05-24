@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -16,12 +16,3 @@ use Illuminate\Http\Request;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:api');
-
-Route::resource('eventType', 'EventTypeController', ['except' => [
-  'create', 'show', 'edit'
-]]);
-Route::resource('event', 'EventApiController', ['except' => [
-  'create', 'show', 'edit'
-]]);
-
-Route::post('/events/getEvents', 'EventApiController@getEventsByDate');

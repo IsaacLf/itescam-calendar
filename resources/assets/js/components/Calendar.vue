@@ -7,7 +7,9 @@
             <button @click="changePeriod(false)" class="btn btn-sm btn-outline-light">
               <font-awesome-icon icon="caret-left"></font-awesome-icon>
             </button>
-            <button @click="changePeriod(true)" class="btn btn-sm btn-outline-light" :disabled="cantGoFurther">
+            <button @click="changePeriod(true)" class="btn btn-sm btn-outline-light"
+            :disabled="isadmin ? false : cantGoFurther"
+            >
               <font-awesome-icon icon="caret-right"></font-awesome-icon>
             </button>
           </div>
@@ -70,7 +72,8 @@ export default {
   props: {
     events: Array,
     eventstype: Array,
-    current: String
+    current: String,
+    isadmin: Number
   },
   data: function () {
     return {
@@ -116,6 +119,9 @@ export default {
     },
     selectedYears: function(newVal, oldVal) {
       this.$emit('changeCalendar', newVal.join('-'));
+    },
+    current: function(newVal, oldVal) {
+      this.currentPeriod = newVal.split('-').map(year => parseInt(year));
     }
   },
   methods: {

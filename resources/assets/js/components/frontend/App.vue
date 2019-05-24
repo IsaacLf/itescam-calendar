@@ -15,7 +15,8 @@
       <calendar
         v-bind:eventstype="EventsType"
         v-bind:events="Events"
-        v-bind:current="currentPeriod"
+        v-bind:current="publishedPeriod"
+        v-bind:isadmin="isadmin"
         v-on:changeCalendar="getCurrentEvents"
       ></calendar>
     </div>
@@ -39,13 +40,16 @@ const Toast = Swal.mixin({
 export default {
   props: {
     eventstype: Array,
-    currentperiod: String
+    published: String,
+    currentperiod: String,
+    isadmin: Number
   },
   data: function () {
     return {
       eventss: [],
       eventsstype: [],
       currentPeriod: '', //This will also be a prop
+      publishedPeriod: '',
       evname: '',
       evtype: '',
       color: '#FFFFFF',
@@ -58,6 +62,7 @@ export default {
   created: function(){
     // this.Events = this.events;
     this.currentPeriod = this.currentperiod;
+    this.publishedPeriod = this.published;
     this.Events = [];
     this.EventsType = this.eventstype;
   },
@@ -90,8 +95,9 @@ export default {
       const start = "-08-01"; const end = "-08-31"
       let response = new Promise((resolve, reject) => {
         let years = period.split('-').map(year => parseInt(year));
-        fetch('/api/events/getEvents',{
+        fetch('/events/getEvents',{
           method: 'POST',
+          credentials: "same-origin",
           body: JSON.stringify({ startDate: `${years[0]}${start}`, endDate: `${years[1]}${end}` }),
           headers:{
             'Content-Type': 'application/json'
