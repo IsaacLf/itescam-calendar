@@ -87,23 +87,17 @@ class EventApiController extends Controller
 
       $startDate = $request->startDate;
       $endDate = $request->endDate;
-      $eventTypesIds = []; $eventTypes;
 
       if(Auth::check())
-        $eventTypes = EventType::byUser();
+        $events = Event::where([
+          ['startDate','>=', $startDate],
+          ['endDate','<=', $endDate]
+        ])->byUser()->get();
       else
-        $eventTypes = EventType::getOnlyOfficials();
-
-      foreach($eventTypes as $evtype){
-        array_push($eventTypesIds, $evtype->id);
-      }
-
-      $events = Event::where([
-        ['startDate','>=', $startDate],
-        ['endDate','<=', $endDate]
-      ])
-      ->whereIn('typeId', $eventTypesIds)
-      ->get();
+        $events = Event::where([
+          ['startDate','>=', $startDate],
+          ['endDate','<=', $endDate]
+        ])->official()->get();
 
       return response()->json($events);
 

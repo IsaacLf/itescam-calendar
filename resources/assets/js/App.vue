@@ -7,9 +7,22 @@
         <h1>Calendario ITESCAM</h1>
       </div>
       <div id="configs" class="col-md-2" style="display: flex;align-items: center; justify-content: center;">
+        <div class="dropdown dropleft">
+          <button class="btn btn-dark dropdown-toggle mr-1" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <font-awesome-icon class="icon" icon="user"/>
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <h6 class="dropdown-header">Acciones</h6>
+            <a  class="dropdown-item" @click="logout"
+                href="javascript:void(0)">Cerrar sesión
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item disabled" href="javascript:void(0)">Usuario: {{ username }}</a>
+          </div>
+        </div>
         <!-- Aquí van los componentes para configurar la fecha del calendario que se publicará -->
         <div class="dropdown dropleft">
-          <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <font-awesome-icon class="icon" icon="cogs"/>
           </button>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -49,7 +62,7 @@
         v-bind:eventstype="EventsType"
         v-bind:events="Events"
         v-bind:current="publishedPeriod"
-        v-bind:isadmin="isadmin"
+        v-bind:hasuser="hasuser"
         v-on:changeCalendar="getCurrentEvents"
       ></calendar>
     </div>
@@ -141,8 +154,8 @@ export default {
     classifs: Array,
     published: String,
     currentperiod: String,
-    isadmin: Number,
-    userid: Number
+    hasuser: Number,
+    uuser: Object
   },
   data: function () {
     return {
@@ -166,15 +179,7 @@ export default {
     el.publishedPeriod = el.published;
     el.Events = [];
     el.EventsType = el.eventstype;
-    fetch(`/user/${el.userid}`, {
-      method: 'GET',
-      credentials: "same-origin"
-    })
-    .then(res => res.json())
-    .catch(err => console.error(err))
-    .then(user => {
-      el.User = new User(user);
-    });
+    el.User = new User(this.uuser);
   },
   computed: {
     Events: {
@@ -205,9 +210,7 @@ export default {
     canCreateEvents: function() {
       let el = this;
       if(el.User instanceof User)
-        return el.User.canCreateOfficialEvents()
-               || el.User.canCreateAreaEvents()
-               || el.User.canCreateAcademicEvents();
+        return el.User.canCreateOfficialEvents();
       return false;
     },
     canPublish: function() {
@@ -215,6 +218,9 @@ export default {
       if(el.User instanceof User)
         return el.User.canPublish();
       return false;
+    },
+    username: function() {
+      return this.uuser.name;
     }
     /** End Permission Props */
   },
@@ -327,6 +333,12 @@ export default {
         }
       })
 
+    },
+
+    logout: function() {
+      fetch('/logout', {method: 'POST'})
+      .then(res => location.replace(res.url))
+      .catch(error => console.error(error));
     }
 
   },

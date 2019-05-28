@@ -29,6 +29,7 @@ var ITESCAM;
             this.day = { value: day };
             this.month = this.getMonthByMMYY(month, year);
             this.year = { value: year };
+            this.time = new Date(year, month - 1, day).getTime();
         }
         MDate.prototype.getMonthByMMYY = function (month, year) {
             var nmon = { value: 0, numdays: 0 };
@@ -37,7 +38,7 @@ var ITESCAM;
                 if (mon.value === month) {
                     nmon.value = month;
                     if (mon.name === 'febrero' && MDate.isLeapYear(year)) {
-                        nmon.numdays = mon.numdays++;
+                        nmon.numdays = mon.numdays + 1;
                     }
                     else {
                         nmon.numdays = mon.numdays;
@@ -223,11 +224,14 @@ var ITESCAM;
                 __year = startMonth.year.value;
             }
             var currentMonth = __startMonth;
-            var month = { value: 0, numdays: 0 };
             var days = [];
             var weeks = [];
             while (currentMonth <= __endMonth) {
-                month = constMonths[currentMonth - 1];
+                var temporal = constMonths[currentMonth - 1];
+                var month = { value: 0, numdays: 0 };
+                month.name = temporal.name;
+                month.value = temporal.value;
+                month.numdays += temporal.numdays;
                 month.year = { value: __year };
                 if (month.value === constMonths[1].value && MDate.isLeapYear(__year)) {
                     month.numdays++;
@@ -551,91 +555,22 @@ var ITESCAM;
             var el = this;
             el.restoreDayEvents();
             el.events.forEach(function (event) {
-                if (typeof event.startDate !== "string" && typeof event.endDate !== "string") {
-                    var sy = event.startDate.year.value, ey = event.endDate.year.value;
-                    var sm = event.startDate.month.value, em = event.endDate.month.value;
-                    var sd = event.startDate.day.value, ed = event.endDate.day.value;
-                    var cy = void 0, cm = void 0;
-                    for (var _i = 0, _a = el.period.years; _i < _a.length; _i++) {
-                        var year = _a[_i];
-                        if (year.value >= sy && year.value <= ey) {
-                            cy = year.value;
-                            for (var _b = 0, _c = year.months; _b < _c.length; _b++) {
-                                var month = _c[_b];
-                                if (cy == sy && sy == ey) {
-                                    if (month.value >= sm && month.value <= em) {
-                                        cm = month.value;
-                                        for (var _d = 0, _e = month.days; _d < _e.length; _d++) {
-                                            var day = _e[_d];
-                                            if (cm == sm && sm == em) {
-                                                if (day.value >= sd && day.value <= ed)
-                                                    day.events.push(event);
-                                            }
-                                            else if (cm == sm && sm != em) {
-                                                if (day.value >= sd)
-                                                    day.events.push(event);
-                                            }
-                                            else if (cm != sm && cm == em) {
-                                                if (day.value <= ed)
-                                                    day.events.push(event);
-                                            }
-                                            else if (cm != sm && cm != em) {
-                                                day.events.push(event);
-                                            }
-                                        }
-                                        el.updateWeeksForSheet(month);
-                                    }
-                                }
-                                else if (cy == sy && sy != ey) {
-                                    if (month.value >= sm) {
-                                        cm = month.value;
-                                        for (var _f = 0, _g = month.days; _f < _g.length; _f++) {
-                                            var day = _g[_f];
-                                            if (cm == sm && sm == em) {
-                                                if (day.value >= sd && day.value <= ed)
-                                                    day.events.push(event);
-                                            }
-                                            else if (cm == sm && sm != em) {
-                                                if (day.value >= sd)
-                                                    day.events.push(event);
-                                            }
-                                            else if (cm != sm && cm == em) {
-                                                if (day.value <= ed)
-                                                    day.events.push(event);
-                                            }
-                                            else if (cm != sm && cm != em) {
-                                                day.events.push(event);
-                                            }
-                                        }
-                                        el.updateWeeksForSheet(month);
-                                    }
-                                }
-                                else if (cy > sy && cy <= ey && month.value <= em) {
-                                    cm = month.value;
-                                    for (var _h = 0, _j = month.days; _h < _j.length; _h++) {
-                                        var day = _j[_h];
-                                        if (cm == sm && sm == em) {
-                                            if (day.value >= sd && day.value <= ed)
-                                                day.events.push(event);
-                                        }
-                                        else if (cm == sm && sm != em) {
-                                            if (day.value >= sd)
-                                                day.events.push(event);
-                                        }
-                                        else if (cm != sm && cm == em) {
-                                            if (day.value <= ed)
-                                                day.events.push(event);
-                                        }
-                                        else if (cm != sm && cm != em) {
-                                            day.events.push(event);
-                                        }
-                                    }
-                                    el.updateWeeksForSheet(month);
-                                }
-                            }
+                var start = event.startDate.year.value;
+                var end = event.endDate.year.value;
+                el.period.years.filter(function (year) { return year.value >= start && year.value <= end; })
+                    .forEach(function (year) { return year.months.forEach(function (month) {
+                    var changesOnMonth = 0;
+                    for (var _i = 0, _a = month.days; _i < _a.length; _i++) {
+                        var day = _a[_i];
+                        var time = new Date(year.value, month.value - 1, day.value).getTime();
+                        if (time >= event.startDate.time && time <= event.endDate.time) {
+                            day.events.push(event);
+                            changesOnMonth++;
                         }
                     }
-                }
+                    if (changesOnMonth > 0)
+                        el.updateWeeksForSheet(month);
+                }); });
             });
         };
         Calendar.prototype.updateWeeksForSheet = function (month) {
@@ -662,91 +597,22 @@ var ITESCAM;
         Calendar.prototype.restoreDayEvents = function () {
             var el = this;
             el.events.forEach(function (event) {
-                if (typeof event.startDate !== "string" && typeof event.endDate !== "string") {
-                    var sy = event.startDate.year.value, ey = event.endDate.year.value;
-                    var sm = event.startDate.month.value, em = event.endDate.month.value;
-                    var sd = event.startDate.day.value, ed = event.endDate.day.value;
-                    var cy = void 0, cm = void 0;
-                    for (var _i = 0, _a = el.period.years; _i < _a.length; _i++) {
-                        var year = _a[_i];
-                        if (year.value >= sy && year.value <= ey) {
-                            cy = year.value;
-                            for (var _b = 0, _c = year.months; _b < _c.length; _b++) {
-                                var month = _c[_b];
-                                if (cy == sy && sy == ey) {
-                                    if (month.value >= sm && month.value <= em) {
-                                        cm = month.value;
-                                        for (var _d = 0, _e = month.days; _d < _e.length; _d++) {
-                                            var day = _e[_d];
-                                            if (cm == sm && sm == em) {
-                                                if (day.value >= sd && day.value <= ed)
-                                                    day.events = [];
-                                            }
-                                            else if (cm == sm && sm != em) {
-                                                if (day.value >= sd)
-                                                    day.events = [];
-                                            }
-                                            else if (cm != sm && cm == em) {
-                                                if (day.value <= ed)
-                                                    day.events = [];
-                                            }
-                                            else if (cm != sm && cm != em) {
-                                                day.events = [];
-                                            }
-                                        }
-                                        el.updateWeeksForSheet(month);
-                                    }
-                                }
-                                else if (cy == sy && sy != ey) {
-                                    if (month.value >= sm) {
-                                        cm = month.value;
-                                        for (var _f = 0, _g = month.days; _f < _g.length; _f++) {
-                                            var day = _g[_f];
-                                            if (cm == sm && sm == em) {
-                                                if (day.value >= sd && day.value <= ed)
-                                                    day.events = [];
-                                            }
-                                            else if (cm == sm && sm != em) {
-                                                if (day.value >= sd)
-                                                    day.events = [];
-                                            }
-                                            else if (cm != sm && cm == em) {
-                                                if (day.value <= ed)
-                                                    day.events = [];
-                                            }
-                                            else if (cm != sm && cm != em) {
-                                                day.events = [];
-                                            }
-                                        }
-                                        el.updateWeeksForSheet(month);
-                                    }
-                                }
-                                else if (cy > sy && cy <= ey && month.value <= em) {
-                                    cm = month.value;
-                                    for (var _h = 0, _j = month.days; _h < _j.length; _h++) {
-                                        var day = _j[_h];
-                                        if (cm == sm && sm == em) {
-                                            if (day.value >= sd && day.value <= ed)
-                                                day.events = [];
-                                        }
-                                        else if (cm == sm && sm != em) {
-                                            if (day.value >= sd)
-                                                day.events = [];
-                                        }
-                                        else if (cm != sm && cm == em) {
-                                            if (day.value <= ed)
-                                                day.events = [];
-                                        }
-                                        else if (cm != sm && cm != em) {
-                                            day.events = [];
-                                        }
-                                    }
-                                    el.updateWeeksForSheet(month);
-                                }
-                            }
+                var start = event.startDate.year.value;
+                var end = event.endDate.year.value;
+                el.period.years.filter(function (year) { return year.value >= start && year.value <= end; })
+                    .forEach(function (year) { return year.months.forEach(function (month) {
+                    var changesOnMonth = 0;
+                    for (var _i = 0, _a = month.days; _i < _a.length; _i++) {
+                        var day = _a[_i];
+                        var time = new Date(year.value, month.value - 1, day.value).getTime();
+                        if (time >= event.startDate.time && time <= event.endDate.time) {
+                            day.events = [];
+                            changesOnMonth++;
                         }
                     }
-                }
+                    if (changesOnMonth > 0)
+                        el.updateWeeksForSheet(month);
+                }); });
             });
         };
         return Calendar;
@@ -770,32 +636,29 @@ var ITESCAM;
         User.prototype.canCreateOfficialEvents = function () {
             return this.user.role.tasks.map(function (task) { return task.id; }).includes(1 /* CREATE_OFFICIAL_EVENTS */);
         };
-        User.prototype.canCreateAreaEvents = function () {
-            return this.user.role.tasks.map(function (task) { return task.id; }).includes(2 /* CREATE_AREA_EVENTS */);
-        };
-        User.prototype.canCreateAcademicEvents = function () {
-            return this.user.role.tasks.map(function (task) { return task.id; }).includes(3 /* CREATE_ACADEMIC_EVENTS */);
-        };
         User.prototype.canCreateEventTypes = function () {
-            return this.user.role.tasks.map(function (task) { return task.id; }).includes(4 /* CREATE_EVENT_TYPES */);
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(2 /* CREATE_EVENT_TYPES */);
         };
         User.prototype.canEditEventTypes = function () {
-            return this.user.role.tasks.map(function (task) { return task.id; }).includes(5 /* EDIT_EVENT_TYPES */);
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(3 /* EDIT_EVENT_TYPES */);
         };
         User.prototype.canDeleteEventTypes = function () {
-            return this.user.role.tasks.map(function (task) { return task.id; }).includes(6 /* DELETE_EVENT_TYPES */);
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(4 /* DELETE_EVENT_TYPES */);
         };
         User.prototype.canEditEvents = function () {
-            return this.user.role.tasks.map(function (task) { return task.id; }).includes(7 /* EDIT_EVENTS */);
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(5 /* EDIT_EVENTS */);
         };
         User.prototype.canDeleteEvents = function () {
-            return this.user.role.tasks.map(function (task) { return task.id; }).includes(8 /* DELETE_EVENTS */);
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(6 /* DELETE_EVENTS */);
         };
         User.prototype.canApproveEvents = function () {
-            return this.user.role.tasks.map(function (task) { return task.id; }).includes(9 /* APPROVE_EVENTS */);
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(7 /* APPROVE_EVENTS */);
+        };
+        User.prototype.canDisapproveEvents = function () {
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(8 /* DISAPPROVE_EVENTS */);
         };
         User.prototype.canPublish = function () {
-            return this.user.role.tasks.map(function (task) { return task.id; }).includes(10 /* PUBLISH */);
+            return this.user.role.tasks.map(function (task) { return task.id; }).includes(9 /* PUBLISH */);
         };
         return User;
     }());

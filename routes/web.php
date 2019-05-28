@@ -27,7 +27,7 @@ Route::get('/login', function() {
 });
 
 Route::post('/login', function(Request $request){
-  if (Auth::attempt(['name' => $request->name, 'password' => $request->password])) {
+  if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
     return redirect()->intended('/calendario/admin');
   }
 });

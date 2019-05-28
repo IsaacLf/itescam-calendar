@@ -6,7 +6,7 @@ $factory->define(App\EventType::class, function (Faker $faker) {
   return [
     'name' => $faker->bothify('Evento ?###'),
     'color'=> $faker->hexcolor(),
-    'classification_id' => $faker->randomElement([1,2,3]),
+    'classification_id' => $faker->randomElement([1]),
     'required' => $faker->randomElement([true, false]),
     'count_required' => $faker->numberBetween(0,5)
   ];

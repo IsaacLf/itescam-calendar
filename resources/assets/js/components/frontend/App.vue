@@ -16,7 +16,7 @@
         v-bind:eventstype="EventsType"
         v-bind:events="Events"
         v-bind:current="publishedPeriod"
-        v-bind:isadmin="isadmin"
+        v-bind:hasuser="hasuser"
         v-on:changeCalendar="getCurrentEvents"
       ></calendar>
     </div>
@@ -42,7 +42,7 @@ export default {
     eventstype: Array,
     published: String,
     currentperiod: String,
-    isadmin: Number
+    hasuser: Number
   },
   data: function () {
     return {

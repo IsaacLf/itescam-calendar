@@ -21,15 +21,14 @@ class TaskTableSeeder extends Seeder
        */
       DB::table('tasks')->insert([
         ['id' => 1,   'description' => 'Crear eventos oficiales'],
-        ['id' => 2,   'description' => 'Crear eventos de área'],
-        ['id' => 3,   'description' => 'Crear eventos académicos'],
-        ['id' => 4,   'description' => 'Crear tipos de eventos'],
-        ['id' => 5,   'description' => 'Editar tipos eventos'],
-        ['id' => 6,   'description' => 'Eliminar tipos de eventos'],
-        ['id' => 7,   'description' => 'Editar eventos'],
-        ['id' => 8,   'description' => 'Eliminar eventos'],
-        ['id' => 9,   'description' => 'Aprobar eventos'],
-        ['id' => 10,  'description' => 'Publicar'],
+        ['id' => 2,   'description' => 'Crear tipos de eventos'],
+        ['id' => 3,   'description' => 'Editar tipos eventos'],
+        ['id' => 4,   'description' => 'Eliminar tipos de eventos'],
+        ['id' => 5,   'description' => 'Editar eventos'],
+        ['id' => 6,   'description' => 'Eliminar eventos'],
+        ['id' => 7,   'description' => 'Aprobar eventos'],
+        ['id' => 8,   'description' => 'Desaprobar eventos'],
+        ['id' => 9,   'description' => 'Publicar'],
       ]);
     }
 }

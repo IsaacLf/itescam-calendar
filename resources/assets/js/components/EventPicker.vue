@@ -64,15 +64,6 @@
                 <label for="colorPick">Color: </label>
                 <sketch-picker id="colorPick" v-model="colors"></sketch-picker>
               </div>
-              <div class="form-group mt-4 ml-3" id="classId">
-                <label for="classifId">Clasificación</label>
-                <select class="form-control" name="cassifs" id="classifs" v-model="classificationId">
-                  <option value="0" disabled selected>Seleccione una opcion</option>
-                  <option v-for="classif of classifs" :key="classif.id" :value="classif.id" style="text-transform: capitalize;">
-                    {{ classif.name }}
-                  </option>
-                </select>
-              </div>
               <div class="form-row">
                 <div class="col align-self-center ml-3">
                   <div class="custom-control custom-checkbox">
@@ -122,7 +113,8 @@
                     <div class="card">
                       <div class="card-body">
                         <h4 class="card-title">{{event.name}}</h4>
-                        <p class="card-text mb-2">Inicio: {{ event.startDate }} | Final: {{ event.endDate }}</p>
+                        <p class="card-text mb-2"><strong>Inicio</strong>: {{ toLocale(event.startDate) }}</p>
+                        <p class="card-text mb-2"><strong>Final</strong>: {{ toLocale(event.endDate) }}</p>
                         <table style="padding-right: 1em;">
                           <tr>
                             <tbody>
@@ -131,6 +123,9 @@
                               </td>
                               <td class="pl-1">
                                 <small>{{ getETName(event.typeId) }}</small>
+                              </td>
+                              <td class="pl-1">
+                                <small style="text-transform: capitalize;">| <strong>Clasificación: </strong> {{ getETClassification(event.typeId) }}</small>
                               </td>
                             </tbody>
                           </tr>
@@ -381,8 +376,7 @@ export default {
           name: el.ETName,
           color: el.colors.hex != undefined ? el.colors.hex : el.colors,
           required: el.ETRequired,
-          count: el.ETCountRequired,
-          classificationId: el.classificationId
+          count: el.ETCountRequired
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -407,8 +401,7 @@ export default {
           name: el.ETName,
           color: el.colors.hex != undefined ? el.colors.hex : el.colors,
           required: el.ETRequired,
-          count: el.ETCountRequired,
-          classificationId: el.classificationId
+          count: el.ETCountRequired
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -479,6 +472,10 @@ export default {
       let evtype = this.EventsType.find(et => et.id == id);
       return evtype.name;
     },
+    getETClassification: function(id) {
+      let evtype = this.EventsType.find(et => et.id == id);
+      return evtype.classification.name;
+    },
     slideEvTypes: function(){
       let slid = document.getElementById('slider');
       let evpicker = document.getElementById('eventpicker');
@@ -495,6 +492,9 @@ export default {
     },
     displayEvTypes: function(){
       console.log('now display');
+    },
+    toLocale: function(date) {
+      return new Date(`${date} 00:00:00`).toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     }
   },
   components: {

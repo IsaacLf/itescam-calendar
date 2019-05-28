@@ -17,6 +17,8 @@ class VerifyCsrfToken extends BaseVerifier
       'event',
       'eventType',
       'events/*',
-      'configuration/*'
+      'configuration/*',
+      '/logout',
+      '/login'
     ];
 }

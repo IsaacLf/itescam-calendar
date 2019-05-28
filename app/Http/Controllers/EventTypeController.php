@@ -41,7 +41,6 @@ class EventTypeController extends Controller
         $eventT->color = $request->color;
         $eventT->required= $request->required;
         $eventT->count_required = $request->count;
-        $eventT->classification_id = $request->classificationId;
         if($eventT->save()){
           return response()->json([
             'status' => 200,
@@ -90,7 +89,6 @@ class EventTypeController extends Controller
         $eventT->color = $request->color;
         $eventT->required= $request->required;
         $eventT->count_required = $request->count;
-        $eventT->classification_id = $request->classificationId;
         if($eventT->save()){
           return response()->json([
             'status' => 200,

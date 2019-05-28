@@ -8,7 +8,7 @@
               <font-awesome-icon icon="caret-left"></font-awesome-icon>
             </button>
             <button @click="changePeriod(true)" class="btn btn-sm btn-outline-light"
-            :disabled="isadmin ? false : cantGoFurther"
+            :disabled="hasuser ? false : cantGoFurther"
             >
               <font-awesome-icon icon="caret-right"></font-awesome-icon>
             </button>
@@ -73,7 +73,7 @@ export default {
     events: Array,
     eventstype: Array,
     current: String,
-    isadmin: Number
+    hasuser: Number
   },
   data: function () {
     return {

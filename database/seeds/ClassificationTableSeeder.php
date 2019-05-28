@@ -12,9 +12,7 @@ class ClassificationTableSeeder extends Seeder
     public function run()
     {
       DB::table('classifications')->insert([
-        ['id' => 1, 'name' => 'oficial'],
-        ['id' => 2, 'name' => 'área'],
-        ['id' => 3, 'name' => 'académico'],
+        ['id' => 1, 'name' => 'oficial']
       ]);
     }
 }

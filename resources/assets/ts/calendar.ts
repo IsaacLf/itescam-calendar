@@ -1,18 +1,18 @@
 namespace ITESCAM {
 
   const constMonths: zellerMonth[] = [
-    { name: "enero", value: 1, numdays: 31, zellerVal: 11 },
-    { name: "febrero", value: 2, numdays: 28, zellerVal: 12 },
-    { name: "marzo", value: 3, numdays: 31, zellerVal: 1 },
-    { name: "abril", value: 4, numdays: 30, zellerVal: 2 },
-    { name: "mayo", value: 5, numdays: 31, zellerVal: 3 },
-    { name: "junio", value: 6, numdays: 30, zellerVal: 4 },
-    { name: "julio", value: 7, numdays: 31, zellerVal: 5 },
-    { name: "agosto", value: 8, numdays: 31, zellerVal: 6 },
-    { name: "septiembre", value: 9, numdays: 30, zellerVal: 7 },
-    { name: "octubre", value: 10, numdays: 31, zellerVal: 8 },
-    { name: "noviembre", value: 11, numdays: 30, zellerVal: 9 },
-    { name: "diciembre", value: 12, numdays: 31, zellerVal: 10 },
+    { name: "enero",      value: 1,   numdays: 31, zellerVal: 11  },
+    { name: "febrero",    value: 2,   numdays: 28, zellerVal: 12  },
+    { name: "marzo",      value: 3,   numdays: 31, zellerVal: 1   },
+    { name: "abril",      value: 4,   numdays: 30, zellerVal: 2   },
+    { name: "mayo",       value: 5,   numdays: 31, zellerVal: 3   },
+    { name: "junio",      value: 6,   numdays: 30, zellerVal: 4   },
+    { name: "julio",      value: 7,   numdays: 31, zellerVal: 5   },
+    { name: "agosto",     value: 8,   numdays: 31, zellerVal: 6   },
+    { name: "septiembre", value: 9,   numdays: 30, zellerVal: 7   },
+    { name: "octubre",    value: 10,  numdays: 31, zellerVal: 8   },
+    { name: "noviembre",  value: 11,  numdays: 30, zellerVal: 9   },
+    { name: "diciembre",  value: 12,  numdays: 31, zellerVal: 10  },
   ];
 
   export const constDays = [
@@ -74,7 +74,7 @@ namespace ITESCAM {
     color: string;
     classification: Classification;
     required?: boolean;
-    'count_required'?: boolean;
+    'count_required'?: number;
   }
 
   export interface Classification {
@@ -98,10 +98,13 @@ namespace ITESCAM {
     day!: Day;
     month!: Month;
     year!: Year;
+    readonly time: number;
+
     constructor(day: number, month: number, year:number){
       this.day = { value: day };
       this.month = this.getMonthByMMYY(month, year);
       this.year = { value: year };
+      this.time = new Date(year, month - 1 , day).getTime();
     }
     getMonthByMMYY(month: number, year: number): Month {
       let nmon: Month = { value: 0, numdays: 0 };
@@ -109,7 +112,7 @@ namespace ITESCAM {
         if(mon.value === month){
           nmon.value = month;
           if(mon.name === 'febrero' && MDate.isLeapYear(year)){
-            nmon.numdays = mon.numdays++;
+            nmon.numdays = mon.numdays + 1;
           } else {
             nmon.numdays = mon.numdays;
           }
@@ -313,11 +316,16 @@ namespace ITESCAM {
         __year = startMonth.year.value;
       }
       let currentMonth = __startMonth;
-      let month: Month = { value: 0, numdays: 0 }; let days: Day[] = [];
+      let days: Day[] = [];
       let weeks: Week[] = [];
       while(currentMonth <= __endMonth){
-        month = constMonths[currentMonth-1];
+        const temporal = constMonths[currentMonth-1];
+        let month: Month = { value: 0, numdays: 0 };
+        month.name = temporal.name;
+        month.value = temporal.value;
+        month.numdays += temporal.numdays;
         month.year = { value: __year };
+
         if(month.value === constMonths[1].value && MDate.isLeapYear(__year)){
           month.numdays++;
         }
@@ -644,86 +652,21 @@ namespace ITESCAM {
       let el = this;
       el.restoreDayEvents();
       el.events.forEach(event => {
-        if (typeof event.startDate !== "string" && typeof event.endDate !== "string"){
-          const sy = event.startDate.year.value, ey = event.endDate.year.value;
-          const sm = event.startDate.month.value, em = event.endDate.month.value;
-          const sd = event.startDate.day.value, ed = event.endDate.day.value;
-          let cy: number, cm: number;
-          for (const year of el.period.years) {
-            if(year.value >= sy && year.value <= ey){
-              cy = year.value;
-              for (const month of year.months) {
-                if(cy == sy && sy == ey){
-                  if(month.value >= sm && month.value <= em){
-                    cm = month.value;
-                    for (const day of month.days) {
-                      if (cm == sm && sm == em){
-                        if(day.value >= sd && day.value <= ed)
-                          day.events.push(event);
-                      }
-                      else if (cm == sm && sm != em){
-                        if(day.value >= sd)
-                          day.events.push(event);
-                      }
-                      else if (cm != sm && cm == em){
-                        if(day.value <= ed)
-                          day.events.push(event);
-                      }
-                      else if(cm != sm && cm != em){
-                        day.events.push(event);
-                      }
-                    }
-                    el.updateWeeksForSheet(month);
-                  }
-                }
-                else if (cy == sy && sy != ey){
-                  if(month.value >= sm){
-                    cm = month.value;
-                    for (const day of month.days) {
-                      if (cm == sm && sm == em){
-                        if(day.value >= sd && day.value <= ed)
-                          day.events.push(event);
-                      }
-                      else if (cm == sm && sm != em){
-                        if(day.value >= sd)
-                          day.events.push(event);
-                      }
-                      else if (cm != sm && cm == em){
-                        if(day.value <= ed)
-                          day.events.push(event);
-                      }
-                      else if(cm != sm && cm != em){
-                        day.events.push(event);
-                      }
-                    }
-                    el.updateWeeksForSheet(month);
-                  }
-                }
-                else if (cy > sy && cy <= ey && month.value <= em){
-                  cm = month.value;
-                  for (const day of month.days) {
-                    if (cm == sm && sm == em){
-                      if(day.value >= sd && day.value <= ed)
-                        day.events.push(event);
-                    }
-                    else if (cm == sm && sm != em){
-                      if(day.value >= sd)
-                        day.events.push(event);
-                    }
-                    else if (cm != sm && cm == em){
-                      if(day.value <= ed)
-                        day.events.push(event);
-                    }
-                    else if(cm != sm && cm != em){
-                      day.events.push(event);
-                    }
-                  }
-                  el.updateWeeksForSheet(month);
-                }
-              }
+        const start = (event.startDate as MDate).year.value;
+        const end = (event.endDate as MDate).year.value;
+        el.period.years.filter(year => year.value >= start && year.value <= end)
+        .forEach(year => year.months.forEach(month => {
+          let changesOnMonth: number = 0;
+          for (const day of month.days) {
+            const time = new Date(year.value, month.value - 1, day.value).getTime();
+            if(time >= (event.startDate as MDate).time && time <= (event.endDate as MDate).time){
+              day.events.push(event);
+              changesOnMonth++;
             }
           }
-        }
+          if(changesOnMonth > 0)
+            el.updateWeeksForSheet(month);
+        }));
       });
     }
     updateWeeksForSheet(month: Month){
@@ -744,86 +687,21 @@ namespace ITESCAM {
     restoreDayEvents(){
       let el = this;
       el.events.forEach(event => {
-        if (typeof event.startDate !== "string" && typeof event.endDate !== "string"){
-          const sy = event.startDate.year.value, ey = event.endDate.year.value;
-          const sm = event.startDate.month.value, em = event.endDate.month.value;
-          const sd = event.startDate.day.value, ed = event.endDate.day.value;
-          let cy: number, cm: number;
-          for (const year of el.period.years) {
-            if(year.value >= sy && year.value <= ey){
-              cy = year.value;
-              for (const month of year.months) {
-                if(cy == sy && sy == ey){
-                  if(month.value >= sm && month.value <= em){
-                    cm = month.value;
-                    for (const day of month.days) {
-                      if (cm == sm && sm == em){
-                        if(day.value >= sd && day.value <= ed)
-                          day.events = [];
-                      }
-                      else if (cm == sm && sm != em){
-                        if(day.value >= sd)
-                          day.events = [];
-                      }
-                      else if (cm != sm && cm == em){
-                        if(day.value <= ed)
-                          day.events = [];
-                      }
-                      else if(cm != sm && cm != em){
-                        day.events = [];
-                      }
-                    }
-                    el.updateWeeksForSheet(month);
-                  }
-                }
-                else if (cy == sy && sy != ey){
-                  if(month.value >= sm){
-                    cm = month.value;
-                    for (const day of month.days) {
-                      if (cm == sm && sm == em){
-                        if(day.value >= sd && day.value <= ed)
-                          day.events = [];
-                      }
-                      else if (cm == sm && sm != em){
-                        if(day.value >= sd)
-                          day.events = [];
-                      }
-                      else if (cm != sm && cm == em){
-                        if(day.value <= ed)
-                          day.events = [];
-                      }
-                      else if(cm != sm && cm != em){
-                        day.events = [];
-                      }
-                    }
-                    el.updateWeeksForSheet(month);
-                  }
-                }
-                else if (cy > sy && cy <= ey && month.value <= em){
-                  cm = month.value;
-                  for (const day of month.days) {
-                    if (cm == sm && sm == em){
-                      if(day.value >= sd && day.value <= ed)
-                        day.events = [];
-                    }
-                    else if (cm == sm && sm != em){
-                      if(day.value >= sd)
-                        day.events = [];
-                    }
-                    else if (cm != sm && cm == em){
-                      if(day.value <= ed)
-                        day.events = [];
-                    }
-                    else if(cm != sm && cm != em){
-                      day.events = [];
-                    }
-                  }
-                  el.updateWeeksForSheet(month);
-                }
-              }
+        const start = (event.startDate as MDate).year.value;
+        const end = (event.endDate as MDate).year.value;
+        el.period.years.filter(year => year.value >= start && year.value <= end)
+        .forEach(year => year.months.forEach(month => {
+          let changesOnMonth: number = 0;
+          for (const day of month.days) {
+            const time = new Date(year.value, month.value - 1, day.value).getTime();
+            if(time >= (event.startDate as MDate).time && time <= (event.endDate as MDate).time){
+              day.events = [];
+              changesOnMonth++;
             }
           }
-        }
+          if(changesOnMonth > 0)
+            el.updateWeeksForSheet(month);
+        }));
       });
     }
   }
@@ -839,15 +717,14 @@ namespace ITESCAM {
 
   const enum Tasks {
     CREATE_OFFICIAL_EVENTS = 1,
-    CREATE_AREA_EVENTS     = 2,
-    CREATE_ACADEMIC_EVENTS = 3,
-    CREATE_EVENT_TYPES     = 4,
-    EDIT_EVENT_TYPES       = 5,
-    DELETE_EVENT_TYPES     = 6,
-    EDIT_EVENTS            = 7,
-    DELETE_EVENTS          = 8,
-    APPROVE_EVENTS         = 9,
-    PUBLISH                = 10
+    CREATE_EVENT_TYPES     = 2,
+    EDIT_EVENT_TYPES       = 3,
+    DELETE_EVENT_TYPES     = 4,
+    EDIT_EVENTS            = 5,
+    DELETE_EVENTS          = 6,
+    APPROVE_EVENTS         = 7,
+    DISAPPROVE_EVENTS      = 8,
+    PUBLISH                = 9
   }
 
   export interface User {
@@ -883,12 +760,6 @@ namespace ITESCAM {
     canCreateOfficialEvents(): boolean {
       return this.user.role.tasks.map(task => task.id).includes(Tasks.CREATE_OFFICIAL_EVENTS);
     }
-    canCreateAreaEvents(): boolean {
-      return this.user.role.tasks.map(task => task.id).includes(Tasks.CREATE_AREA_EVENTS);
-    }
-    canCreateAcademicEvents(): boolean {
-      return this.user.role.tasks.map(task => task.id).includes(Tasks.CREATE_ACADEMIC_EVENTS);
-    }
     canCreateEventTypes(): boolean {
       return this.user.role.tasks.map(task => task.id).includes(Tasks.CREATE_EVENT_TYPES);
     }
@@ -906,6 +777,9 @@ namespace ITESCAM {
     }
     canApproveEvents(): boolean {
       return this.user.role.tasks.map(task => task.id).includes(Tasks.APPROVE_EVENTS);
+    }
+    canDisapproveEvents(): boolean {
+      return this.user.role.tasks.map(task => task.id).includes(Tasks.DISAPPROVE_EVENTS);
     }
     canPublish(): boolean {
       return this.user.role.tasks.map(task => task.id).includes(Tasks.PUBLISH);

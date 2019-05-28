@@ -19,10 +19,7 @@ class RoleTableSeeder extends Seeder
        * 4: General
        */
       DB::table('roles')->insert([
-        ['id' => 1, 'name' => 'administrador'],
-        ['id' => 2, 'name' => 'director'],
-        ['id' => 3, 'name' => 'profesor'],
-        ['id' => 4, 'name' => 'general']
+        ['id' => 1, 'name' => 'administrador']
       ]);
     }
 }
