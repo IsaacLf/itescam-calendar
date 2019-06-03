@@ -112,20 +112,27 @@
                   <div v-for="event of Events" :key="event.id" class="tab-pane fade" :id="'list-'+event.id" role="tabpanel" aria-labelledby="list">
                     <div class="card">
                       <div class="card-body">
-                        <h4 class="card-title">{{event.name}}</h4>
+                        <h4 class="card-title">{{event.name}}
+                          <i class="float-right">
+                            <font-awesome-icon @click="toggleEditEvent(event.id)" style="padding: 2px; cursor: pointer;" title="Editar" icon="edit"/>
+                          </i>
+                        </h4>
                         <p class="card-text mb-2"><strong>Inicio</strong>: {{ toLocale(event.startDate) }}</p>
                         <p class="card-text mb-2"><strong>Final</strong>: {{ toLocale(event.endDate) }}</p>
-                        <table style="padding-right: 1em;">
+                        <table style="padding-right: 1em; width: 100%;">
                           <tr>
                             <tbody>
                               <td>
                                 <canvas width="20px" height="20px" style="border: 2px solid black;" v-bind:style="{ background: getETColor(event.typeId) }"></canvas>
                               </td>
-                              <td class="pl-1">
+                              <td class="pl-1 text-center" width="31%">
                                 <small>{{ getETName(event.typeId) }}</small>
                               </td>
-                              <td class="pl-1">
+                              <td class="pl-1 text-center" width="35%">
                                 <small style="text-transform: capitalize;">| <strong>Clasificación: </strong> {{ getETClassification(event.typeId) }}</small>
+                              </td>
+                              <td class="pl-1 text-center" width="34%">
+                                <small style="text-transform: capitalize;">| <strong>Status: </strong> {{ getEventStatus(event.status) }}</small>
                               </td>
                             </tbody>
                           </tr>
@@ -148,8 +155,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-primary">Aceptar</button>
+            <button type="button" class="btn btn-dark" data-dismiss="modal">Cerrar</button>
           </div>
         </div>
       </div>
@@ -162,7 +168,7 @@ import Swal from 'sweetalert2';
 import { Sketch } from 'vue-color';
 import store from '../store/store';
 import { setTimeout } from 'timers';
-import { User } from '../calendar';
+import { User, EventStatus } from '../calendar';
 
 const Toast = Swal.mixin({
   toast: true,
@@ -195,18 +201,19 @@ export default {
   },
   data: function () {
     return {
+      // DATA FOR EVENT TYPES
       iSelected: 0,
       eSelected: 0,
       colors: '#090B10',
       ETName: '',
       ETRequired: false,
       ETCountRequired: 0,
-      classificationId: 1,
       modText: 'Agregar nuevo tipo de evento',
+      edit: false,
+      // COMMON DATA
+      toggled: false,
       eventTArray: [],
       eventArray: [],
-      edit: false,
-      toggled: false
     }
   },
   created: function() {
@@ -225,11 +232,6 @@ export default {
       }, 2500);
 
     }).then(response => { selectFirstEvent(); })
-    // el.eventSelect = el.Events[el.Events.length - 1].id;
-
-    /* JUST TO FETCH */
-    // store.dispatch("fetchEventsType", {self: this});
-    // store.dispatch("fetchEvents", {self: this});
   },
   mounted: function() {
     // let back = document.getElementsByClassName('modal-backdrop');
@@ -335,7 +337,6 @@ export default {
       this.ETName = '';
       this.ETRequired = false;
       this.ETCountRequired = 0;
-      this.classificationId = 1;
     },
     addNewEventType: function() {
       this.dismissData();
@@ -365,7 +366,6 @@ export default {
       this.ETName = selectedEvent.name;
       this.ETRequired = selectedEvent.required;
       this.ETCountRequired = selectedEvent['count_required'];
-      this.classificationId = selectedEvent.classification.id;
     },
     saveNew: function () {
       let el = this;
@@ -476,6 +476,10 @@ export default {
       let evtype = this.EventsType.find(et => et.id == id);
       return evtype.classification.name;
     },
+    getEventStatus: function(status) {
+      let statname = EventStatus.find(stat => stat.id == status).name;
+      return statname != undefined ? statname : '';
+    },
     slideEvTypes: function(){
       let slid = document.getElementById('slider');
       let evpicker = document.getElementById('eventpicker');
@@ -495,6 +499,11 @@ export default {
     },
     toLocale: function(date) {
       return new Date(`${date} 00:00:00`).toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    },
+    toggleEditEvent: function(id) {
+      let el = this;
+      let event = el.events.find(event => event.id == id);
+      el.$emit("toggleEditEvent", event);
     }
   },
   components: {

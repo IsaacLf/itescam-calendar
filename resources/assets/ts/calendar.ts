@@ -32,6 +32,10 @@ namespace ITESCAM {
     month?: Month;
     year?: Year;
     color?: string;
+    /**
+     * This property indicates whether the font color is going to be `light (white)` or `dark (black)`
+     */
+    fontcolor?: string;
     events?: Event[]
   }
 
@@ -88,11 +92,17 @@ namespace ITESCAM {
     ACADEMIC  = 3
   }
 
-  const enum Status {
-    PENDING   = 1,
-    APPROVED  = 2,
-    PUBLISHED = 3
+  export enum Status {
+    DISAPPROVED   = 1,
+    APPROVED      = 2,
+    PUBLISHED     = 3
   }
+
+  export const EventStatus = [
+    { id: Status.DISAPPROVED,   name: 'Desaprobado' },
+    { id: Status.APPROVED,      name: 'Aprobado'    },
+    { id: Status.PUBLISHED,     name: 'Publicado'   },
+  ];
 
   export class MDate {
     day!: Day;
@@ -392,6 +402,7 @@ namespace ITESCAM {
           name: name,
           abbr: (typeof name === "string") ? name.substring(0, 3) : undefined,
           color: '',
+          fontcolor: 'black',
           events: []
         });
         //color : '-moz-linear-gradient(left, black, grey 30%, green 30%, white)'
@@ -462,8 +473,9 @@ namespace ITESCAM {
       return weeks;
     }
     /**
-     * Applies the Zeller rule to calculate the name of an speciefied Date
-     * @param {number} day The day of in number format
+     * Applies the Zeller's rule to calculate the name of an speciefied Date
+     * @see http://mathforum.org/dr.math/faq/faq.calendar.html the section of "Zeller's Rule"
+     * @param {number} day The day in number format
      * @param {number} month The month in number format
      * @param {number} year The year in number format
      */
@@ -671,14 +683,22 @@ namespace ITESCAM {
     }
     updateWeeksForSheet(month: Month){
       for (const day of month.days) {
-        const evLength = day.events.length;
-        if(evLength == 1){
-          const evType = this.eventTypes.find(et => et.id === day.events[0].typeId);
-          day.color = evType.color;
-        }else if(evLength >= 2){
-          const evType1 = this.eventTypes.find(et => et.id === day.events[0].typeId);
-          const evType2 = this.eventTypes.find(et => et.id === day.events[1].typeId);
-          day.color = getTwoGradientString(evType1.color, evType2.color);
+        let ignore = day.name == "sábado" || day.name == "domingo" ? true : false;
+        if(!ignore){
+          const evLength = day.events.length;
+          if(evLength == 0 && day.color != '') {
+            day.color = '';
+            day.fontcolor = "black";
+          }else if(evLength == 1) {
+            const evType = this.eventTypes.find(et => et.id === day.events[0].typeId);
+            day.color = evType.color;
+            day.fontcolor = lightOrDark(evType.color) == "light" ? "black" : "white";
+          }else if(evLength >= 2) {
+            const evType1 = this.eventTypes.find(et => et.id === day.events[0].typeId);
+            const evType2 = this.eventTypes.find(et => et.id === day.events[1].typeId);
+            day.color = getTwoGradientString(evType1.color, evType2.color);
+            day.fontcolor = lightOrDark(evType1.color) == "light" ? "black" : "white";
+          }
         }
       }
       let weeks: Week[] = this.getWeeksForCalendar(month.days);
@@ -713,6 +733,55 @@ namespace ITESCAM {
     gradient += `-o-linear-gradient(90deg, ${fColor} 50%, ${sColor} 50%); ` /* For old Opera (11.1 to 12.0) */
     gradient += `linear-gradient(90deg, ${fColor} 50%, ${sColor} 50%);` /* Standard syntax; must be last */
     return gradient;
+  }
+
+  /**
+   * Get a color and determines if it's a dark o light color
+   * @param color The color to evaluate
+   * @returns A string with a string `dark|light` depending of the color brightness
+   */
+  function lightOrDark(color: string): string {
+
+    let temporal: number | any[] | RegExpMatchArray;
+    let r: number, g: number, b: number, hsp: number;
+
+    // Check the format of the color, HEX or RGB?
+    if (color.match(/^rgb/)) {
+
+      // If HEX --> store the red, green, blue values in separate variables
+      temporal = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
+
+      r = temporal[1];
+      g = temporal[2];
+      b = temporal[3];
+    }
+    else {
+
+      // If RGB --> Convert it to HEX: http://gist.github.com/983661
+      temporal = +("0x" + color.slice(1).replace(
+      color.length < 5 && /./g, '$&$&'));
+
+      r = temporal >> 16;
+      g = temporal >> 8 & 255;
+      b = temporal & 255;
+    }
+
+    // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
+    hsp = Math.sqrt(
+      0.299 * (r * r) +
+      0.587 * (g * g) +
+      0.114 * (b * b)
+    );
+
+    // Using the HSP value, determine whether the color is light or dark
+    if (hsp>127.5) {
+
+      return 'light';
+    }
+    else {
+
+      return 'dark';
+    }
   }
 
   const enum Tasks {

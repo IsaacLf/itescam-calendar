@@ -18,7 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/calendario/admin', 'CalendarController@__admin')->middleware('auth');
+Route::get('/calendario/admin', 'CalendarController@__admin');
 
 Route::get('/calendario', 'CalendarController@getView');
 
@@ -50,9 +50,13 @@ Route::resource('event', 'EventApiController', ['except' => [
 
 Route::post('/events/getEvents', 'EventApiController@getEventsByDate');
 
+Route::post('/events/getPublished', 'EventApiController@getPublishedByDate');
+
+Route::post('/events/publishEvents', 'EventApiController@publishEvents');
+
 Route::post('/configuration/getPublishedPeriod', 'ConfigurationController@getPublishedPeriod');
 
-Route::post('/configuration/publishCalendar', 'ConfigurationController@update');
+Route::post('/configuration/activateCalendar', 'ConfigurationController@update');
 
 Route::get('/user/{id}', function($id) {
   return App\User::findOrFail($id)->toJson();

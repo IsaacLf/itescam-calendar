@@ -95,7 +95,7 @@ export default {
       const start = "-08-01"; const end = "-08-31"
       let response = new Promise((resolve, reject) => {
         let years = period.split('-').map(year => parseInt(year));
-        fetch('/events/getEvents',{
+        fetch('/events/getPublished',{
           method: 'POST',
           credentials: "same-origin",
           body: JSON.stringify({ startDate: `${years[0]}${start}`, endDate: `${years[1]}${end}` }),

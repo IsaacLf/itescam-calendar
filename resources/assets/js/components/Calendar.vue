@@ -52,7 +52,7 @@
                 </thead>
                 <tbody>
                   <tr v-for="week of month.weeks" :key="week.id" class="week">
-                    <td v-for="day of week.days" :key="day.id" class="no-text-select" :style="`background: ${ day.color != undefined ? day.color : '' }`">
+                    <td v-for="day of week.days" :key="day.id" class="no-text-select" :class="`text-${day.fontcolor}`" :style="`background: ${ day.color != undefined ? day.color : '' };`">
                       {{ day.value > 0 ? day.value: "" }}
                     </td>
                   </tr>
@@ -213,6 +213,15 @@ export default {
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
+  }
+
+  .text-white {
+    color: white;
+  }
+
+  .text-dark,
+  .text-black {
+    color: black;
   }
 
   .content td {

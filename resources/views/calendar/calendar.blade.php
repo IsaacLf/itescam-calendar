@@ -13,32 +13,33 @@
 @endsection
 
 @php
-  $eventtypes = [];
-  $hasuser = 0;
-  $userid = 1;
-  if(Auth::check()) {
-    $eventtypes = App\EventType::byUser();
-    $hasuser = 1;
-    $userid = Auth::id();
-    $user = App\User::default();
-  }
-  else {
-    $eventtypes = App\EventType::getOnlyOfficials();
-    $hasuser = 0;
-  }
+  $eventtypes = App\EventType::getOnlyOfficials();
+  $hasuser = $isAdmin;
+  $email = 'example@domain.com';
+  $username = 'noone';
+  $name = "user";
+  $tasks = App\Task::all();
 @endphp
 
 @section('content')
-@if($hasuser)
-
-@endif
 <app
   v-bind:eventstype="{{ $eventtypes }}"
   v-bind:classifs="{{ App\Classification::all() }}"
   v-bind:currentperiod="'{{ $currentPeriod }}'"
   v-bind:published="'{{ $currentPeriod }}'"
   v-bind:hasuser="{{ $hasuser }}"
-  v-bind:uuser=" {{ $hasuser ? App\User::find($userid) : '{ email: ``, id: 0, name: `noone`, role: { id: 0, name: `noone`, tasks: [] } }' }} "
+  v-bind:uuser=" {{ '{
+                        id: 0,
+                        email: `'.$email.'`,
+                        username: `'.$username.'` ,
+                        name: `'.$name.'`,
+                        role: {
+                          id: 0,
+                          name: `administrador`,
+                          tasks: '.$tasks.'
+                        }
+                    }'
+                }}"
 ></app>
 @endsection
 

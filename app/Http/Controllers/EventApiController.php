@@ -35,6 +35,7 @@ class EventApiController extends Controller
         $event->description = $request->description;
         $event->startDate = $request->startDate;
         $event->endDate = $request->endDate;
+        $event->status = $request->status;
         if($event->save()){
           return response()->json([
             'status' => 200,
@@ -67,7 +68,23 @@ class EventApiController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+      $event = Event::find($id);
+      $event->typeId = $request->typeId;
+      $event->name = $request->name;
+      $event->description = $request->description;
+      $event->startDate = $request->startDate;
+      $event->endDate = $request->endDate;
+      $event->status = $request->status;
+      if($event->save()){
+        return response()->json([
+          'status' => 200,
+          'message' => 'Guardado exitosamente'
+        ]);
+      }
+      return response()->json([
+        'status' => 500,
+        'message' => 'No se pudo guardar'
+      ]);
     }
 
     /**
@@ -101,5 +118,28 @@ class EventApiController extends Controller
 
       return response()->json($events);
 
+    }
+
+    public function getPublishedByDate(Request $request) {
+
+      $startDate = $request->startDate;
+      $endDate = $request->endDate;
+      $events = Event::where([
+        ['startDate','>=', $startDate],
+        ['endDate','<=', $endDate]
+      ])->official()->published()->get();
+
+      return response()->json($events);
+
+    }
+
+
+    public function publishEvents(Request $request) {
+      $ids = $request->events;
+      Event::whereIn('id', $ids)->update([ 'status' => 3 ]);
+      return response()->json([
+        'status' => 200,
+        'message' => 'Publicados exitosamente: ['.count($ids).']'
+      ]);
     }
 }

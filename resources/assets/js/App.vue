@@ -12,10 +12,6 @@
             <font-awesome-icon class="icon" icon="user"/>
           </button>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <h6 class="dropdown-header">Acciones</h6>
-            <a  class="dropdown-item" @click="logout"
-                href="javascript:void(0)">Cerrar sesión
-            </a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item disabled" href="javascript:void(0)">Usuario: {{ username }}</a>
           </div>
@@ -27,15 +23,16 @@
           </button>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <h6 class="dropdown-header">Acciones</h6>
-            <a  class="dropdown-item" :class="{ disabled: !canPublish || publishedPeriod == currentPeriod }"
-                @click="publishCurrentCalendar"
+            <a  class="dropdown-item" :class="{ disabled: !canPublish || activePeriod == currentPeriod }"
+                @click="activateCurrentCalendar"
                 href="javascript:void(0)">Marcar 'activo' este calendario
             </a>
             <a  class="dropdown-item" :class="{ disabled: !canPublish }"
+                @click="publishApprovedEvents"
                 href="javascript:void(0)">Publicar eventos de este ciclo
             </a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item disabled" href="javascript:void(0)">Activo: {{ publishedPeriod }}</a>
+            <a class="dropdown-item disabled" href="javascript:void(0)">Activo: {{ activePeriod }}</a>
           </div>
         </div>
       </div>
@@ -55,13 +52,14 @@
       v-bind:classifs="classifs"
       v-on:eventsChange="updateEvents"
       v-on:eventsTChange="updateEventsType"
+      v-on:toggleEditEvent="toggleEditEvent"
     ></event-picker>
     </div>
     <div id="calendar" :class="$mq">
       <calendar
         v-bind:eventstype="EventsType"
         v-bind:events="Events"
-        v-bind:current="publishedPeriod"
+        v-bind:current="activePeriod"
         v-bind:hasuser="hasuser"
         v-on:changeCalendar="getCurrentEvents"
       ></calendar>
@@ -73,8 +71,8 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Nuevo evento</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <h5 class="modal-title">{{ modText }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="dismissData">
               <span aria-hidden="true">&times;</span>
             </button>
         </div>
@@ -116,16 +114,21 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-12 form-group text-center">
-                <label class="non-selectable" for="show">Visible para el público general: </label>
-                <input type="checkbox" name="show" id="show" v-model="show">
+              <div class="col-12 form-group">
+                <label for="evname"> Status del evento: </label>
+                <select class="form-control" v-model="evstat" name="evstat" id="evstat" data-show-content="true">
+                  <option value="" disabled>No seleccionado</option>
+                  <option v-for="eventstat in eventStatus" :key="eventstat.id" :value="eventstat.id">
+                    {{ eventstat.name }}
+                  </option>
+                </select>
               </div>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" @click="saveNewEv">Guardar</button>
+          <button type="button" class="btn btn-secondary" @click="dismissData" data-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" @click="[ edit ? saveUpdated() : saveNewEv() ]">Guardar</button>
         </div>
       </div>
     </div>
@@ -139,7 +142,7 @@ import EventPicker from './components/EventPicker.vue';
 import Calendar from './components/Calendar.vue';
 import store from './store/store';
 import Swal from 'sweetalert2';
-import { User } from './calendar';
+import { User, EventStatus, Status } from './calendar';
 
 const Toast = Swal.mixin({
   toast: true,
@@ -163,9 +166,15 @@ export default {
       eventsstype: [],
       currentPeriod: '',
       user: {},
-      publishedPeriod: '',
+      activePeriod: '',
+      eventStatus: [],
+      // DATA FOR EVENTS
+      edit: false,
+      modText: 'Nuevo evento',
+      evid: '',
       evname: '',
       evtype: '',
+      evstat: 2,
       color: '#FFFFFF',
       desc: '',
       startDate: '',
@@ -176,10 +185,11 @@ export default {
   created: function(){
     let el = this;
     el.currentPeriod = el.currentperiod;
-    el.publishedPeriod = el.published;
+    el.activePeriod = el.published;
     el.Events = [];
     el.EventsType = el.eventstype;
     el.User = new User(this.uuser);
+    el.eventStatus = EventStatus;
   },
   computed: {
     Events: {
@@ -220,17 +230,15 @@ export default {
       return false;
     },
     username: function() {
-      return this.uuser.name;
+      return this.uuser.username;
     }
     /** End Permission Props */
   },
   methods: {
     updateEvents: function (value){
-      // console.log("Entré a UpdateEvents [App]", value);
       this.Events = value;
     },
     updateEventsType: function (value){
-      // console.log("Entré a UpdateEventsT [App]", value);
       this.EventsType = value;
     },
     saveNewEv: function () {
@@ -244,7 +252,36 @@ export default {
           description: el.desc,
           visible: el.show,
           startDate: el.startDate,
-          endDate: el.endDate
+          endDate: el.endDate,
+          status: el.evstat
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .catch(err => console.error(err))
+      .then(function(res) {
+        Toast.fire({
+          type: 'success',
+          title: 'Agregado correctamente'
+        })
+        el.callApi();
+      })
+    },
+    saveUpdated: function() {
+      let el = this;
+      fetch(`/event/${el.evid}`,{
+        method: 'PUT',
+        credentials: "same-origin",
+        body: JSON.stringify({
+          typeId: el.evtype,
+          name: el.evname,
+          description: el.desc,
+          visible: el.show,
+          startDate: el.startDate,
+          endDate: el.endDate,
+          status: el.evstat
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -270,12 +307,15 @@ export default {
     },
     dismissData: function () {
       let el = this;
+      el.modText = 'Nuevo evento';
       el.evtype = '';
       el.evname = '';
       el.desc = '';
-      el.show = false;
+      el.evstat = 1;
       el.startDate = '';
       el.endDate = '';
+      el.color = '#FFFFFF';
+      el.edit = false;
     },
     getCurrentEvents: function(period) {
       let el = this;
@@ -304,9 +344,9 @@ export default {
       })
       return response;
     },
-    publishCurrentCalendar: function() {
+    activateCurrentCalendar: function() {
       let el = this;
-      fetch('/configuration/publishCalendar',{
+      fetch('/configuration/activateCalendar',{
         method: 'POST',
         credentials: "same-origin",
         body: JSON.stringify({
@@ -322,9 +362,9 @@ export default {
         if(res.status == 200) {
           Toast.fire({
             type: 'success',
-            title: 'Publicado correctamente'
+            title: 'Marcado como activo'
           })
-          el.publishedPeriod = res.activeCalendar
+          el.activePeriod = res.activeCalendar
         } else {
           Toast.fire({
             type: 'error',
@@ -335,10 +375,55 @@ export default {
 
     },
 
+    publishApprovedEvents: function() {
+      let el = this;
+      let events = el.Events.filter(event => event.status == Status.APPROVED).map(event => event.id);
+      fetch('/events/publishEvents',{
+        method: 'POST',
+        credentials: "same-origin",
+        body: JSON.stringify({
+          events: events
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .catch(err => console.error(err))
+      .then(res => {
+        if(res.status == 200) {
+          Toast.fire({
+            type: 'success',
+            title: res.message
+          })
+          el.fetchEvents(el.currentPeriod);
+        } else {
+          Toast.fire({
+            type: 'error',
+            title: 'Hubo un error inesperado'
+          })
+        }
+      })
+    },
+
     logout: function() {
       fetch('/logout', {method: 'POST'})
       .then(res => location.replace(res.url))
       .catch(error => console.error(error));
+    },
+
+    toggleEditEvent: function(event) {
+      let el = this;
+      el.modText = `Editar: ${event.name}`;
+      el.evtype = event.typeId;
+      el.evname = event.name;
+      el.desc = event.description;
+      el.startDate = event.startDate;
+      el.endDate = event.endDate;
+      el.evstat = event.status;
+      el.evid = event.id;
+      el.edit = true;
+      $('#addNewEvent').modal();
     }
 
   },
