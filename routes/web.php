@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\Auth;
 */
 // Auth::routes();
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
-Route::get('/calendario/admin', 'CalendarController@__admin');
+Route::get('/admin', 'CalendarController@__admin');
 
-Route::get('/calendario', 'CalendarController@getView');
+Route::get('/', 'CalendarController@getView');
 
 Route::get('/login', function() {
   return view('auth.login');
