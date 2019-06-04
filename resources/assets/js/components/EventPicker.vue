@@ -177,6 +177,8 @@ const Toast = Swal.mixin({
   timer: 3000
 });
 
+const url = document.querySelector('[name="site-url"]').content;
+
 function selectFirstEvent(){
   let query = document.querySelector('[id="list-tab"]');
   if(query.childNodes.length > 0){
@@ -197,7 +199,7 @@ export default {
     eventstype: Array,
     events: Array,
     classifs: Array,
-    user: Object
+    user: Object,
   },
   data: function () {
     return {
@@ -369,7 +371,7 @@ export default {
     },
     saveNew: function () {
       let el = this;
-      fetch('/eventType',{
+      fetch(`${url}/eventType`,{
         method: 'POST',
         credentials: "same-origin",
         body: JSON.stringify({
@@ -394,7 +396,7 @@ export default {
     },
     updateEl: function () {
       let el = this;
-      fetch(`/eventType/${el.selected}`,{
+      fetch(`${url}/eventType/${el.selected}`,{
         method: 'PUT',
         credentials: "same-origin",
         body: JSON.stringify({
@@ -435,7 +437,7 @@ export default {
         reverseButtons: true
       }).then((result) => {
         if (result.value) {
-          fetch(`/eventType/${el.selected}`,{
+          fetch(`${url}/eventType/${el.selected}`,{
             method: 'DELETE',
             credentials: "same-origin"
           })
@@ -455,7 +457,7 @@ export default {
     },
     callApi: function () {
       let el = this;
-      fetch('/eventType')
+      fetch(`${url}/eventType`)
       .then(res => res.json())
       .catch(err => console.error(err))
       .then(function(res){

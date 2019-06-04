@@ -37,6 +37,8 @@ const Toast = Swal.mixin({
   timer: 3000
 });
 
+const url = document.querySelector('[name="site-url"]').content;
+
 export default {
   props: {
     eventstype: Array,
@@ -95,7 +97,7 @@ export default {
       const start = "-08-01"; const end = "-08-31"
       let response = new Promise((resolve, reject) => {
         let years = period.split('-').map(year => parseInt(year));
-        fetch('/events/getPublished',{
+        fetch(`${url}/events/getPublished`,{
           method: 'POST',
           credentials: "same-origin",
           body: JSON.stringify({ startDate: `${years[0]}${start}`, endDate: `${years[1]}${end}` }),

@@ -151,6 +151,8 @@ const Toast = Swal.mixin({
   timer: 3000
 });
 
+const url = document.querySelector('[name="site-url"]').content;
+
 export default {
   props: {
     eventstype: Array,
@@ -243,7 +245,7 @@ export default {
     },
     saveNewEv: function () {
       let el = this;
-      fetch('/event',{
+      fetch(`${url}/event`,{
         method: 'POST',
         credentials: "same-origin",
         body: JSON.stringify({
@@ -271,7 +273,7 @@ export default {
     },
     saveUpdated: function() {
       let el = this;
-      fetch(`/event/${el.evid}`,{
+      fetch(`${url}/event/${el.evid}`,{
         method: 'PUT',
         credentials: "same-origin",
         body: JSON.stringify({
@@ -327,7 +329,7 @@ export default {
       const start = "-08-01"; const end = "-08-31"
       let response = new Promise((resolve, reject) => {
         let years = period.split('-').map(year => parseInt(year));
-        fetch('/events/getEvents',{
+        fetch(`${url}/events/getEvents`,{
           method: 'POST',
           credentials: "same-origin",
           body: JSON.stringify({ startDate: `${years[0]}${start}`, endDate: `${years[1]}${end}` }),
@@ -346,7 +348,7 @@ export default {
     },
     activateCurrentCalendar: function() {
       let el = this;
-      fetch('/configuration/activateCalendar',{
+      fetch(`${url}/configuration/activateCalendar`,{
         method: 'POST',
         credentials: "same-origin",
         body: JSON.stringify({
@@ -378,7 +380,7 @@ export default {
     publishApprovedEvents: function() {
       let el = this;
       let events = el.Events.filter(event => event.status == Status.APPROVED).map(event => event.id);
-      fetch('/events/publishEvents',{
+      fetch(`${url}/events/publishEvents`,{
         method: 'POST',
         credentials: "same-origin",
         body: JSON.stringify({
