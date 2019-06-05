@@ -196,8 +196,8 @@ namespace ITESCAM {
   export class Calendar {
     period!: Period;
     periods?: Period[];
-    eventTypes?: EventType[];
-    events?: Event[];
+    eventTypes?: EventType[] = [];
+    events?: Event[] = [];
     // cycles?: Cycle[];
     constructor()
     constructor(startDate?: MDate, endDate?: MDate) {
@@ -690,14 +690,24 @@ namespace ITESCAM {
             day.color = '';
             day.fontcolor = "black";
           }else if(evLength == 1) {
-            const evType = this.eventTypes.find(et => et.id === day.events[0].typeId);
-            day.color = evType.color;
-            day.fontcolor = lightOrDark(evType.color) == "light" ? "black" : "white";
+            const evType = this.eventTypes.find(et => et.id == day.events[0].typeId);
+            if(evType != undefined){
+              day.color = evType.color;
+              day.fontcolor = lightOrDark(evType.color) == "light" ? "black" : "white";
+            }
+            else {
+              console.log(this.eventTypes, this.events);
+            }
           }else if(evLength >= 2) {
-            const evType1 = this.eventTypes.find(et => et.id === day.events[0].typeId);
-            const evType2 = this.eventTypes.find(et => et.id === day.events[1].typeId);
-            day.color = getTwoGradientString(evType1.color, evType2.color);
-            day.fontcolor = lightOrDark(evType1.color) == "light" ? "black" : "white";
+            const evType1 = this.eventTypes.find(et => et.id == day.events[0].typeId);
+            const evType2 = this.eventTypes.find(et => et.id == day.events[1].typeId);
+            if(evType1 != undefined && evType2 != undefined){
+              day.color = getTwoGradientString(evType1.color, evType2.color);
+              day.fontcolor = lightOrDark(evType1.color) == "light" ? "black" : "white";
+            }
+            else {
+              console.log(this.eventTypes, this.events);
+            }
           }
         }
       }

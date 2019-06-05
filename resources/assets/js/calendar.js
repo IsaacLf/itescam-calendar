@@ -107,6 +107,8 @@ var ITESCAM;
     }
     var Calendar = /** @class */ (function () {
         function Calendar(startDate, endDate) {
+            this.eventTypes = [];
+            this.events = [];
             if (typeof startDate !== "undefined" && typeof endDate !== "undefined") {
                 this.period = this.createPeriod(startDate, endDate);
                 this.periods = [];
@@ -596,15 +598,25 @@ var ITESCAM;
                         day.fontcolor = "black";
                     }
                     else if (evLength == 1) {
-                        var evType = this_1.eventTypes.find(function (et) { return et.id === day.events[0].typeId; });
-                        day.color = evType.color;
-                        day.fontcolor = lightOrDark(evType.color) == "light" ? "black" : "white";
+                        var evType = this_1.eventTypes.find(function (et) { return et.id == day.events[0].typeId; });
+                        if (evType != undefined) {
+                            day.color = evType.color;
+                            day.fontcolor = lightOrDark(evType.color) == "light" ? "black" : "white";
+                        }
+                        else {
+                            console.log(this_1.eventTypes, this_1.events);
+                        }
                     }
                     else if (evLength >= 2) {
-                        var evType1 = this_1.eventTypes.find(function (et) { return et.id === day.events[0].typeId; });
-                        var evType2 = this_1.eventTypes.find(function (et) { return et.id === day.events[1].typeId; });
-                        day.color = getTwoGradientString(evType1.color, evType2.color);
-                        day.fontcolor = lightOrDark(evType1.color) == "light" ? "black" : "white";
+                        var evType1 = this_1.eventTypes.find(function (et) { return et.id == day.events[0].typeId; });
+                        var evType2 = this_1.eventTypes.find(function (et) { return et.id == day.events[1].typeId; });
+                        if (evType1 != undefined && evType2 != undefined) {
+                            day.color = getTwoGradientString(evType1.color, evType2.color);
+                            day.fontcolor = lightOrDark(evType1.color) == "light" ? "black" : "white";
+                        }
+                        else {
+                            console.log(this_1.eventTypes, this_1.events);
+                        }
                     }
                 }
             };
