@@ -21,7 +21,10 @@ class CreateEventsTable extends Migration
             $table->integer('status')->default(1);
             $table->date('startDate');
             $table->date('endDate')->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

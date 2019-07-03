@@ -20,7 +20,10 @@ class CreateEventTypesTable extends Migration
         $table->integer('classification_id')->default(1);
         $table->boolean("required")->default(false);
         $table->integer("count_required")->default(0);
+        $table->string('created_by')->nullable();
+        $table->string('updated_by')->nullable();
         $table->timestamps();
+        $table->softDeletes();
       });
     }
 

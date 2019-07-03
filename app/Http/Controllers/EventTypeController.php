@@ -41,6 +41,8 @@ class EventTypeController extends Controller
         $eventT->color = $request->color;
         $eventT->required= $request->required;
         $eventT->count_required = $request->count;
+        $eventT->created_by = $request->username;
+        $eventT->updated_by = $request->username;
         if($eventT->save()){
           return response()->json([
             'status' => 200,
@@ -89,6 +91,7 @@ class EventTypeController extends Controller
         $eventT->color = $request->color;
         $eventT->required= $request->required;
         $eventT->count_required = $request->count;
+        $eventT->updated_by = $request->username;
         if($eventT->save()){
           return response()->json([
             'status' => 200,
@@ -107,9 +110,11 @@ class EventTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
       $eventT = EventType::findOrFail($id);
+      $eventT->updated_by = $request->username;
+      $eventT->save();
       if($eventT->delete()){
         return response()->json([
           'status' => 200,

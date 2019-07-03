@@ -36,6 +36,8 @@ class EventApiController extends Controller
         $event->startDate = $request->startDate;
         $event->endDate = $request->endDate;
         $event->status = $request->status;
+        $event->created_by = $request->username;
+        $event->updated_by = $request->username;
         if($event->save()){
           return response()->json([
             'status' => 200,
@@ -75,6 +77,7 @@ class EventApiController extends Controller
       $event->startDate = $request->startDate;
       $event->endDate = $request->endDate;
       $event->status = $request->status;
+      $event->updated_by = $request->username;
       if($event->save()){
         return response()->json([
           'status' => 200,
@@ -93,9 +96,21 @@ class EventApiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+      $event = Event::findOrFail($id);
+      $event->updated_by = $request->username;
+      $event->save();
+      if($event->delete()){
+        return response()->json([
+          'status' => 200,
+          'message' => 'Eliminado exitosamente'
+        ]);
+      }
+      return response()->json([
+        'status' => 500,
+        'message' => 'No se pudo eliminar'
+      ]);
     }
 
     /* Other requests in here */

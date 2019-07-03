@@ -378,7 +378,8 @@ export default {
           name: el.ETName,
           color: el.colors.hex != undefined ? el.colors.hex : el.colors,
           required: el.ETRequired,
-          count: el.ETCountRequired
+          count: el.ETCountRequired,
+          username: el.user.user.username
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -403,7 +404,8 @@ export default {
           name: el.ETName,
           color: el.colors.hex != undefined ? el.colors.hex : el.colors,
           required: el.ETRequired,
-          count: el.ETCountRequired
+          count: el.ETCountRequired,
+          username: el.user.user.username
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -439,7 +441,13 @@ export default {
         if (result.value) {
           fetch(`${url}/eventType/${el.selected}`,{
             method: 'DELETE',
-            credentials: "same-origin"
+            credentials: "same-origin",
+            body: JSON.stringify({
+              username: el.user.user.username
+            }),
+            headers: {
+              'Content-Type': 'application/json'
+            }
           })
           .then(res => res.json())
           .catch(err => console.error(err))

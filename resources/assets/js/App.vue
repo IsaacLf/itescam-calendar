@@ -128,6 +128,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" @click="dismissData" data-dismiss="modal">Cancelar</button>
+          <button v-show="edit" type="button" class="btn btn-danger" @click="deleteEvent">Eliminar</button>
           <button type="button" class="btn btn-primary" @click="[ edit ? saveUpdated() : saveNewEv() ]">Guardar</button>
         </div>
       </div>
@@ -255,7 +256,8 @@ export default {
           visible: el.show,
           startDate: el.startDate,
           endDate: el.endDate,
-          status: el.evstat
+          status: el.evstat,
+          username: el.User.user.username
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -283,7 +285,8 @@ export default {
           visible: el.show,
           startDate: el.startDate,
           endDate: el.endDate,
-          status: el.evstat
+          status: el.evstat,
+          username: el.User.user.username
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -297,6 +300,48 @@ export default {
           title: 'Agregado correctamente'
         })
         el.callApi();
+      })
+    },
+    deleteEvent: function() {
+      let el = this;
+      const swalWithBootstrapButtons = Swal.mixin({
+        confirmButtonClass: 'btn btn-success',
+        cancelButtonClass: 'btn btn-danger',
+        // buttonsStyling: false,
+      })
+
+      swalWithBootstrapButtons.fire({
+        title: '¿Está seguro?',
+        text: "No será capaz de revetir esta acción!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, elimínalo!',
+        cancelButtonText: 'No',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.value) {
+          fetch(`${url}/event/${el.evid}`,{
+            method: 'DELETE',
+            credentials: "same-origin",
+            body: JSON.stringify({
+              username: el.user.user.username
+            }),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(res => res.json())
+          .catch(err => console.error(err))
+          .then(function(res){
+            $('#addNewEvent').modal('hide');
+            el.dismissData();
+            Toast.fire({
+              type: 'success',
+              title: 'Eliminado correctamente'
+            })
+            el.callApi();
+          })
+        }
       })
     },
     callApi: function () {
