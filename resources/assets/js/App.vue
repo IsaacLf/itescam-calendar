@@ -106,11 +106,14 @@
             <div class="row">
               <div class="col-6 form-group">
                 <label for="startDate">Fecha de inicio</label>
-                <input class="form-control" type="date" name="startDate" v-model="startDate" id="startDate">
+                <!--input class="form-control" type="date" name="startDate" v-model="startDate" id="startDate"-->
+                <datepicker v-model="startDate" name="startDate" id="startDate" :language="es"></datepicker>
+                
               </div>
               <div class="col-6 form-group">
                 <label for="endDate">Fecha de final</label>
-                <input class="form-control" type="date" name="endDate" v-model="endDate" id="endDate">
+                <!--input class="form-control" type="date" name="endDate" v-model="endDate" id="endDate"-->
+                <datepicker v-model="endDate" name="endDate" id="endDate" :language="es"></datepicker>
               </div>
             </div>
             <div class="row">
@@ -141,6 +144,7 @@
 <script>
 import EventPicker from './components/EventPicker.vue';
 import Calendar from './components/Calendar.vue';
+import Datepicker from 'vuejs-datepicker';
 import store from './store/store';
 import Swal from 'sweetalert2';
 import { User, EventStatus, Status } from './calendar';
@@ -485,7 +489,8 @@ export default {
   },
   components: {
     'event-picker': EventPicker,
-    'calendar': Calendar
+    'calendar': Calendar,
+    Datepicker
   }
 }
 </script>
