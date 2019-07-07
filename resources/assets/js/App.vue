@@ -471,12 +471,13 @@ export default {
 
     toggleEditEvent: function(event) {
       let el = this;
+
       el.modText = `Editar: ${event.name}`;
       el.evtype = event.typeId;
       el.evname = event.name;
       el.desc = event.description;
-      el.startDate = event.startDate;
-      el.endDate = event.endDate;
+      el.startDate = event.startDate + " 12:00:00";
+      el.endDate = event.endDate + " 12:00:00";
       el.evstat = event.status;
       el.evid = event.id;
       el.edit = true;
