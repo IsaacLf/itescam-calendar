@@ -107,13 +107,13 @@
               <div class="col-6 form-group">
                 <label for="startDate">Fecha de inicio</label>
                 <!--input class="form-control" type="date" name="startDate" v-model="startDate" id="startDate"-->
-                <datepicker v-model="startDate" name="startDate" id="startDate" :language="es"></datepicker>
+                <datepicker v-model="startDate" name="startDate" id="startDate" :language="es" placeholder="Dia Mes Año"></datepicker>
                 
               </div>
               <div class="col-6 form-group">
                 <label for="endDate">Fecha de final</label>
                 <!--input class="form-control" type="date" name="endDate" v-model="endDate" id="endDate"-->
-                <datepicker v-model="endDate" name="endDate" id="endDate" :language="es"></datepicker>
+                <datepicker v-model="endDate" name="endDate" id="endDate" :language="es" placeholder="Dia Mes Año"></datepicker>
               </div>
             </div>
             <div class="row">
@@ -145,6 +145,7 @@
 import EventPicker from './components/EventPicker.vue';
 import Calendar from './components/Calendar.vue';
 import Datepicker from 'vuejs-datepicker';
+import moment from 'moment';
 import store from './store/store';
 import Swal from 'sweetalert2';
 import { User, EventStatus, Status } from './calendar';
@@ -250,6 +251,8 @@ export default {
     },
     saveNewEv: function () {
       let el = this;
+      el.startDate = moment(el.startDate).format('YYYY-MM-DD');
+      el.endDate = moment(el.endDate).format('YYYY-MM-DD');
       fetch(`${url}/event`,{
         method: 'POST',
         credentials: "same-origin",
@@ -279,6 +282,8 @@ export default {
     },
     saveUpdated: function() {
       let el = this;
+      el.startDate = moment(el.startDate).format('YYYY-MM-DD');
+      el.endDate = moment(el.endDate).format('YYYY-MM-DD');
       fetch(`${url}/event/${el.evid}`,{
         method: 'PUT',
         credentials: "same-origin",
@@ -375,6 +380,7 @@ export default {
     },
     fetchEvents: function(period) {
       let el = this;
+      
       const start = "-08-01"; const end = "-08-31"
       let response = new Promise((resolve, reject) => {
         let years = period.split('-').map(year => parseInt(year));

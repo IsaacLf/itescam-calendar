@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "bootstrap-select": "^1.13.9",
+    "moment": "^2.24.0",
     "vuejs-datepicker": "^0.9.9"
   }
 }
