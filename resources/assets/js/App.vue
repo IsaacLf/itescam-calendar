@@ -43,6 +43,10 @@
     <font-awesome-icon class="icon" icon="calendar-plus"/>
   </a>
 
+  <a v-if="canCreateEvents" id="seeEvents" href="javascript:void(0)" role="button" class="float" :class="$mq" title="Ver eventos" data-toggle="modal" data-target="#eventModal">
+    <font-awesome-icon class="icon" icon="calendar-week"/>
+  </a>
+
   <div class="admin-container" :class="$mq">
     <div id="eventpicker" :class="$mq">
     <event-picker
@@ -108,7 +112,7 @@
                 <label for="startDate">Fecha de inicio</label>
                 <!--input class="form-control" type="date" name="startDate" v-model="startDate" id="startDate"-->
                 <datepicker v-model="startDate" name="startDate" id="startDate" :language="es" placeholder="Dia Mes Año"></datepicker>
-                
+
               </div>
               <div class="col-6 form-group">
                 <label for="endDate">Fecha de final</label>
@@ -380,7 +384,7 @@ export default {
     },
     fetchEvents: function(period) {
       let el = this;
-      
+
       const start = "-08-01"; const end = "-08-31"
       let response = new Promise((resolve, reject) => {
         let years = period.split('-').map(year => parseInt(year));

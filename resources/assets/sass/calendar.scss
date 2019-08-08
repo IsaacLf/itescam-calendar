@@ -1,6 +1,7 @@
 
 $blue: #007bff;
 $black: #000000;
+$green: #00c251;
 
 .header {
   text-transform: capitalize;
@@ -49,6 +50,10 @@ $black: #000000;
 
     &#addEvent {
       @extend %float-add-props;
+    }
+
+    &#seeEvents {
+      @extend %float-see-props;
     }
 
     &#slider {
@@ -142,6 +147,10 @@ $black: #000000;
       @extend %float-add-props;
     }
 
+    &#seeEvents {
+      @extend %float-see-props;
+    }
+
     &#slider {
       @extend %float-slider-props;
       -webkit-user-drag: none;
@@ -169,6 +178,15 @@ $black: #000000;
   right:40px;
   border-radius:50px;
   background-color: $blue;
+}
+
+%float-see-props {
+  @extend %float-button-props;
+  width:60px;
+  bottom:105px;
+  right:40px;
+  border-radius:50px;
+  background-color: $green;
 }
 
 %float-slider-props {

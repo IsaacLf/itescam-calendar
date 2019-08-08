@@ -123,7 +123,8 @@
 }
 
 .desktop#addEvent[class*=float],
-.laptop#addEvent[class*=float], .mobile#addEvent[class*=float], .tablet#addEvent[class*=float], .mobile#slider[class*=float], .tablet#slider[class*=float] {
+.laptop#addEvent[class*=float], .mobile#addEvent[class*=float], .tablet#addEvent[class*=float], .desktop#seeEvents[class*=float],
+.laptop#seeEvents[class*=float], .mobile#seeEvents[class*=float], .tablet#seeEvents[class*=float], .mobile#slider[class*=float], .tablet#slider[class*=float] {
   position: fixed;
   height: 60px;
   color: #FFF;
@@ -138,6 +139,15 @@
   right: 40px;
   border-radius: 50px;
   background-color: #007bff;
+}
+
+.desktop#seeEvents[class*=float],
+.laptop#seeEvents[class*=float], .mobile#seeEvents[class*=float], .tablet#seeEvents[class*=float] {
+  width: 60px;
+  bottom: 105px;
+  right: 40px;
+  border-radius: 50px;
+  background-color: #00c251;
 }
 
 .mobile#slider[class*=float], .tablet#slider[class*=float] {
