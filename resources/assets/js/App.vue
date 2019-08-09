@@ -111,7 +111,8 @@
               <div class="col-6 form-group">
                 <label for="startDate">Fecha de inicio</label>
                 <!--input class="form-control" type="date" name="startDate" v-model="startDate" id="startDate"-->
-                <datepicker v-model="startDate" name="startDate" id="startDate" :language="language" placeholder="Dia Mes Año"></datepicker>
+                <datepicker v-model="startDate" name="startDate" id="startDate" :language="language" placeholder="Dia Mes Año"
+                @change="endDate = startDate"></datepicker>
 
               </div>
               <div class="col-6 form-group">
@@ -148,7 +149,7 @@
 import EventPicker from './components/EventPicker.vue';
 import Calendar from './components/Calendar.vue';
 import Datepicker from 'vuejs-datepicker';
-import DateLanguages from 'vuejs-datepicker/dist/DateLanguages'
+import DateLanguages from './components/DateLanguages';
 import moment from 'moment';
 import store from './store/store';
 import Swal from 'sweetalert2';
@@ -498,6 +499,11 @@ export default {
     },
     currentPeriod: function(nue, old) {
       this.fetchEvents(nue);
+    },
+    startDate: function(nue, old) {
+      if(this.endDate == ""){
+        this.endDate = nue;
+      }
     }
   },
   components: {
