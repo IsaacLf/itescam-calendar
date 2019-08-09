@@ -32,15 +32,15 @@
           <span>
             <font-awesome-icon :icon="['fab','elementor']"/>
           </span>
-          {{ !($mq == 'mobile'||$mq=='tablet') ? 'Tipo de evento' : ''}}
+          {{ !($mq == 'mobile'||$mq=='tablet') ? 'Nuevo Evento' : ''}}
         </button>
-        <button class="btn btn-sm btn-primary" type="button" data-toggle="modal" data-target="#eventModal">
+        <!--button class="btn btn-sm btn-primary" type="button" data-toggle="modal" data-target="#eventModal">
           <font-awesome-icon icon="calendar-week"/>
           {{ !($mq == 'mobile'||$mq=='tablet') ? 'Eventos' : ''}}
-        </button>
+        </button-->
         <button @click="editSelected()" class="btn btn-sm btn-success" :disabled="!canEditEventTypes" type="button" data-toggle="modal" data-target="#typeEventPick">
           <font-awesome-icon icon="edit"/>
-          {{ !($mq == 'mobile'||$mq=='tablet') ? 'Editar' : ''}}
+          {{ !($mq == 'mobile'||$mq=='tablet') ? 'Editar Evento' : ''}}
         </button>
       </div>
     </div>

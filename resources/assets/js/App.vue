@@ -111,13 +111,13 @@
               <div class="col-6 form-group">
                 <label for="startDate">Fecha de inicio</label>
                 <!--input class="form-control" type="date" name="startDate" v-model="startDate" id="startDate"-->
-                <datepicker v-model="startDate" name="startDate" id="startDate" :language="es" placeholder="Dia Mes Año"></datepicker>
+                <datepicker v-model="startDate" name="startDate" id="startDate" :language="language" placeholder="Dia Mes Año"></datepicker>
 
               </div>
               <div class="col-6 form-group">
                 <label for="endDate">Fecha de final</label>
                 <!--input class="form-control" type="date" name="endDate" v-model="endDate" id="endDate"-->
-                <datepicker v-model="endDate" name="endDate" id="endDate" :language="es" placeholder="Dia Mes Año"></datepicker>
+                <datepicker v-model="endDate" name="endDate" id="endDate" :language="language" placeholder="Dia Mes Año"></datepicker>
               </div>
             </div>
             <div class="row">
@@ -144,11 +144,11 @@
   <!-- End Of NEW Event Modal -->
 </div>
 </template>
-
 <script>
 import EventPicker from './components/EventPicker.vue';
 import Calendar from './components/Calendar.vue';
 import Datepicker from 'vuejs-datepicker';
+import DateLanguages from 'vuejs-datepicker/dist/DateLanguages'
 import moment from 'moment';
 import store from './store/store';
 import Swal from 'sweetalert2';
@@ -164,7 +164,7 @@ const Toast = Swal.mixin({
 const url = document.querySelector('[name="site-url"]').content;
 
 export default {
-  props: {
+ props: {
     eventstype: Array,
     classifs: Array,
     published: String,
@@ -191,7 +191,9 @@ export default {
       desc: '',
       startDate: '',
       endDate: '',
-      show: false
+      show: false,
+      language: 'es',
+      languages: DateLanguages.translations
     }
   },
   created: function(){
