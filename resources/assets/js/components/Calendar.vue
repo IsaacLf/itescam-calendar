@@ -17,7 +17,12 @@
       </div>
       <div class="col-md-8">
         <div class="title">
-          <h1 class="no-text-select" v-text="periodName"></h1>
+          <h1 class="no-text-select">
+            {{ periodName }}
+            <span v-show="current == period.name" title="Activo">
+              <font-awesome-icon icon="check-circle"></font-awesome-icon>
+            </span>
+          </h1>
         </div>
       </div>
       <div class="col-md-2 align-self-center text-center">

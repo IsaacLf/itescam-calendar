@@ -111,8 +111,7 @@
               <div class="col-6 form-group">
                 <label for="startDate">Fecha de inicio</label>
                 <!--input class="form-control" type="date" name="startDate" v-model="startDate" id="startDate"-->
-                <datepicker v-model="startDate" name="startDate" id="startDate" :language="language" placeholder="Dia Mes Año"
-                @change="endDate = startDate"></datepicker>
+                <datepicker v-model="startDate" name="startDate" id="startDate" :language="language" placeholder="Dia Mes Año"></datepicker>
 
               </div>
               <div class="col-6 form-group">
