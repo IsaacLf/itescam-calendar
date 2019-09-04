@@ -70,6 +70,7 @@ namespace ITESCAM {
     endDate?: MDate | string;
     status: Status;
     description?: string;
+    useSaturday: boolean;
   }
 
   export interface EventType {
@@ -647,10 +648,12 @@ namespace ITESCAM {
           nomEvents.push({
             id: event.id,
             name: event.name,
+            description: event.description,
             typeId: event.typeId,
             startDate: new MDate(sdA[2], sdA[1], sdA[0]),
             endDate: new MDate(edA[2], edA[1], edA[0]),
-            status: event.status
+            status: event.status,
+            useSaturday: event.useSaturday
           })
         }
       });
@@ -683,27 +686,52 @@ namespace ITESCAM {
     }
     updateWeeksForSheet(month: Month){
       for (const day of month.days) {
-        let ignore = day.name == "sábado" || day.name == "domingo" ? true : false;
+        const ignore = day.name == "domingo" ? true : false;
+        const isSaturday = day.name == "sábado";
         if(!ignore){
           const evLength = day.events.length;
           if(evLength == 0 && day.color != '') {
             day.color = '';
             day.fontcolor = "black";
           }else if(evLength == 1) {
-            const evType = this.eventTypes.find(et => et.id == day.events[0].typeId);
-            if(evType != undefined){
+            const event = day.events[0];
+            const evType = this.eventTypes.find(et => et.id == event.typeId);
+            if(evType != undefined) {
               day.color = evType.color;
               day.fontcolor = lightOrDark(evType.color) == "light" ? "black" : "white";
+              // if(isSaturday) {
+              //   console.log(`Es sábado: ${day.value} de ${day.month.name} del ${day.year.value}, y yo (${event.name}) uso sábado: ${event.useSaturday}`);
+              // }
+              if(isSaturday && !event.useSaturday){
+                day.color = '';
+                day.fontcolor = "black";
+              }
             }
             else {
               console.log(this.eventTypes, this.events);
             }
           }else if(evLength >= 2) {
-            const evType1 = this.eventTypes.find(et => et.id == day.events[0].typeId);
-            const evType2 = this.eventTypes.find(et => et.id == day.events[1].typeId);
+            const event1 = day.events[0];
+            const event2 = day.events[1];
+            const evType1 = this.eventTypes.find(et => et.id == event1.typeId);
+            const evType2 = this.eventTypes.find(et => et.id == event2.typeId);
             if(evType1 != undefined && evType2 != undefined){
               day.color = getTwoGradientString(evType1.color, evType2.color);
               day.fontcolor = lightOrDark(evType1.color) == "light" ? "black" : "white";
+              if(isSaturday) {
+                if(event1.useSaturday && !event2.useSaturday){
+                  day.color = evType1.color;
+                  day.fontcolor = lightOrDark(evType1.color) == "light" ? "black" : "white";
+                }
+                else if(!event1.useSaturday && event2.useSaturday) {
+                  day.color = evType2.color;
+                  day.fontcolor = lightOrDark(evType2.color) == "light" ? "black" : "white";
+                }
+                else if(!event1.useSaturday && !event2.useSaturday){
+                  day.color = '';
+                  day.fontcolor = "black";
+                }
+              }
             }
             else {
               console.log(this.eventTypes, this.events);

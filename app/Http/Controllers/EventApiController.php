@@ -36,6 +36,7 @@ class EventApiController extends Controller
         $event->startDate = $request->startDate;
         $event->endDate = $request->endDate;
         $event->status = $request->status;
+        $event->useSaturday = $request->useSaturday;
         $event->created_by = $request->username;
         $event->updated_by = $request->username;
         if($event->save()){
@@ -77,6 +78,7 @@ class EventApiController extends Controller
       $event->startDate = $request->startDate;
       $event->endDate = $request->endDate;
       $event->status = $request->status;
+      $event->useSaturday = $request->useSaturday;
       $event->updated_by = $request->username;
       if($event->save()){
         return response()->json([

@@ -19,6 +19,7 @@ class CreateEventsTable extends Migration
             $table->string("name")->nullable();
             $table->text('description');
             $table->integer('status')->default(1);
+            $table->boolean('useSaturday')->default(false);
             $table->date('startDate');
             $table->date('endDate')->nullable();
             $table->string('created_by')->nullable();

@@ -553,10 +553,12 @@ var ITESCAM;
                     nomEvents.push({
                         id: event.id,
                         name: event.name,
+                        description: event.description,
                         typeId: event.typeId,
                         startDate: new MDate(sdA[2], sdA[1], sdA[0]),
                         endDate: new MDate(edA[2], edA[1], edA[0]),
-                        status: event.status
+                        status: event.status,
+                        useSaturday: event.useSaturday
                     });
                 }
             });
@@ -590,7 +592,8 @@ var ITESCAM;
         };
         Calendar.prototype.updateWeeksForSheet = function (month) {
             var _loop_1 = function (day) {
-                var ignore = day.name == "sábado" || day.name == "domingo" ? true : false;
+                var ignore = day.name == "domingo" ? true : false;
+                var isSaturday = day.name == "sábado";
                 if (!ignore) {
                     var evLength = day.events.length;
                     if (evLength == 0 && day.color != '') {
@@ -598,21 +601,45 @@ var ITESCAM;
                         day.fontcolor = "black";
                     }
                     else if (evLength == 1) {
-                        var evType = this_1.eventTypes.find(function (et) { return et.id == day.events[0].typeId; });
+                        var event_1 = day.events[0];
+                        var evType = this_1.eventTypes.find(function (et) { return et.id == event_1.typeId; });
                         if (evType != undefined) {
                             day.color = evType.color;
                             day.fontcolor = lightOrDark(evType.color) == "light" ? "black" : "white";
+                            // if(isSaturday) {
+                            //   console.log(`Es sábado: ${day.value} de ${day.month.name} del ${day.year.value}, y yo (${event.name}) uso sábado: ${event.useSaturday}`);
+                            // }
+                            if (isSaturday && !event_1.useSaturday) {
+                                day.color = '';
+                                day.fontcolor = "black";
+                            }
                         }
                         else {
                             console.log(this_1.eventTypes, this_1.events);
                         }
                     }
                     else if (evLength >= 2) {
-                        var evType1 = this_1.eventTypes.find(function (et) { return et.id == day.events[0].typeId; });
-                        var evType2 = this_1.eventTypes.find(function (et) { return et.id == day.events[1].typeId; });
+                        var event1_1 = day.events[0];
+                        var event2_1 = day.events[1];
+                        var evType1 = this_1.eventTypes.find(function (et) { return et.id == event1_1.typeId; });
+                        var evType2 = this_1.eventTypes.find(function (et) { return et.id == event2_1.typeId; });
                         if (evType1 != undefined && evType2 != undefined) {
                             day.color = getTwoGradientString(evType1.color, evType2.color);
                             day.fontcolor = lightOrDark(evType1.color) == "light" ? "black" : "white";
+                            if (isSaturday) {
+                                if (event1_1.useSaturday && !event2_1.useSaturday) {
+                                    day.color = evType1.color;
+                                    day.fontcolor = lightOrDark(evType1.color) == "light" ? "black" : "white";
+                                }
+                                else if (!event1_1.useSaturday && event2_1.useSaturday) {
+                                    day.color = evType2.color;
+                                    day.fontcolor = lightOrDark(evType2.color) == "light" ? "black" : "white";
+                                }
+                                else if (!event1_1.useSaturday && !event2_1.useSaturday) {
+                                    day.color = '';
+                                    day.fontcolor = "black";
+                                }
+                            }
                         }
                         else {
                             console.log(this_1.eventTypes, this_1.events);

@@ -16,6 +16,7 @@ $factory->define(App\Event::class, function (Faker $faker) {
       'startDate' => $start,
       'endDate' => $end,
       'description' => $faker->realText($maxNbChars = 30, $indexSize = 2),
-      'status' => $faker->randomElement([1,2,3])
+      'status' => $faker->randomElement([1,2,3]),
+      'useSaturday' => $faker->randomElement([true, false])
     ];
 });

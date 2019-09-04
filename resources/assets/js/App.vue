@@ -121,7 +121,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-12 form-group">
+              <div class="col-6 form-group">
                 <label for="evname"> Status del evento: </label>
                 <select class="form-control" v-model="evstat" name="evstat" id="evstat" data-show-content="true">
                   <option value="" disabled>No seleccionado</option>
@@ -129,6 +129,10 @@
                     {{ eventstat.name }}
                   </option>
                 </select>
+              </div>
+              <div class="col-6 form-group">
+                <label for="evname"> ¿Activo en sábado?: </label>
+                <input class="form-control" type="checkbox" v-model="useSaturday" name="useSaturday" id="useSaturday" data-show-content="true">
               </div>
             </div>
           </form>
@@ -191,6 +195,7 @@ export default {
       desc: '',
       startDate: '',
       endDate: '',
+      useSaturday: false,
       show: false,
       language: 'es',
       languages: DateLanguages.translations
@@ -270,6 +275,7 @@ export default {
           startDate: el.startDate,
           endDate: el.endDate,
           status: el.evstat,
+          useSaturday: el.useSaturday,
           username: el.User.user.username
         }),
         headers: {
@@ -301,6 +307,7 @@ export default {
           startDate: el.startDate,
           endDate: el.endDate,
           status: el.evstat,
+          useSaturday: el.useSaturday,
           username: el.User.user.username
         }),
         headers: {
@@ -378,6 +385,7 @@ export default {
       el.endDate = '';
       el.color = '#FFFFFF';
       el.edit = false;
+      el.useSaturday = false;
     },
     getCurrentEvents: function(period) {
       let el = this;
@@ -487,6 +495,7 @@ export default {
       el.evstat = event.status;
       el.evid = event.id;
       el.edit = true;
+      el.useSaturday = event.useSaturday;
       $('#addNewEvent').modal();
     }
 
