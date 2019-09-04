@@ -93,7 +93,7 @@
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="EventModalLabel">Eventos</h5>
+            <h5 class="modal-title" id="EventModalLabel">Eventos : {{ selectedEventType.name }}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -150,7 +150,7 @@
               <div class="card-header">Oh vaya!</div>
               <div class="card-body">
                 <h5 class="card-title">No hay eventos!</h5>
-                <p class="card-text">Parece que nadie ha añadido eventos para este ciclo.</p>
+                <p class="card-text">Parece que nadie ha añadido eventos para este ciclo o este tipo de evento.</p>
               </div>
             </div>
           </div>
@@ -285,7 +285,8 @@ export default {
     },
     Events: {
       get: function() {
-        return this.eventArray;
+        let el = this;
+        return el.eventArray.filter(event => event.typeId == el.selected);
       },
       set: function(array) {
         this.$emit('eventsChange', array);
@@ -307,6 +308,10 @@ export default {
       set: function(val) {
         this.edit = val;
       }
+    },
+    selectedEventType: function () {
+      let el = this;
+      return el.EventsType.find(event => event.id == el.selected);
     },
     /** Start Permission Props*/
     canEditEventTypes: function () {
@@ -332,6 +337,7 @@ export default {
     },
     select: function (id) {
       this.selected = id;
+      setTimeout(() => { selectFirstEvent(); }, 500);
     },
     dismissData: function () {
       this.modalText = 'Agregar nuevo tipo de evento';
