@@ -762,6 +762,24 @@ namespace ITESCAM {
         }));
       });
     }
+    restoreDaysForEvent(event: Event) {
+      event = this.events.find(e => e.id == event.id);
+      const start = (event.startDate as MDate).year.value;
+      const end = (event.endDate as MDate).year.value;
+      this.period.years.filter(year => year.value >= start && year.value <= end)
+      .forEach(year => year.months.forEach(month => {
+        let changesOnMonth: number = 0;
+        for (const day of month.days) {
+          const time = new Date(year.value, month.value - 1, day.value).getTime();
+          if(time >= (event.startDate as MDate).time && time <= (event.endDate as MDate).time){
+            day.events = [];
+            changesOnMonth++;
+          }
+        }
+        if(changesOnMonth > 0)
+          this.updateWeeksForSheet(month);
+      }));
+    }
   }
 
   function getTwoGradientString(fColor: string, sColor: string) {

@@ -676,6 +676,26 @@ var ITESCAM;
                 }); });
             });
         };
+        Calendar.prototype.restoreDaysForEvent = function (event) {
+            var _this = this;
+            event = this.events.find(function (e) { return e.id == event.id; });
+            var start = event.startDate.year.value;
+            var end = event.endDate.year.value;
+            this.period.years.filter(function (year) { return year.value >= start && year.value <= end; })
+                .forEach(function (year) { return year.months.forEach(function (month) {
+                var changesOnMonth = 0;
+                for (var _i = 0, _a = month.days; _i < _a.length; _i++) {
+                    var day = _a[_i];
+                    var time = new Date(year.value, month.value - 1, day.value).getTime();
+                    if (time >= event.startDate.time && time <= event.endDate.time) {
+                        day.events = [];
+                        changesOnMonth++;
+                    }
+                }
+                if (changesOnMonth > 0)
+                    _this.updateWeeksForSheet(month);
+            }); });
+        };
         return Calendar;
     }());
     ITESCAM.Calendar = Calendar;

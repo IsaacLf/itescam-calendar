@@ -65,6 +65,8 @@
         v-bind:events="Events"
         v-bind:current="activePeriod"
         v-bind:hasuser="hasuser"
+        v-bind:deleted="deleted"
+        v-on:cleanedEvent="callApi"
         v-on:changeCalendar="getCurrentEvents"
       ></calendar>
     </div>
@@ -195,6 +197,7 @@ export default {
       desc: '',
       startDate: '',
       endDate: '',
+      deleted: 0,
       useSaturday: false,
       show: false,
       language: 'es',
@@ -354,14 +357,15 @@ export default {
           })
           .then(res => res.json())
           .catch(err => console.error(err))
-          .then(function(res){
+          .then(function(res) {
             $('#addNewEvent').modal('hide');
             el.dismissData();
             Toast.fire({
               type: 'success',
               title: 'Eliminado correctamente'
             })
-            el.callApi();
+            el.deleted = el.evid;
+            // el.callApi(); this is going to be done after cleaning event
           })
         }
       })

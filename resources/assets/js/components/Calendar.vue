@@ -78,7 +78,8 @@ export default {
     events: Array,
     eventstype: Array,
     current: String,
-    hasuser: Number
+    hasuser: Number,
+    deleted: Number
   },
   data: function () {
     return {
@@ -127,6 +128,12 @@ export default {
     },
     current: function(newVal, oldVal) {
       this.currentPeriod = newVal.split('-').map(year => parseInt(year));
+    },
+    deleted: function(newVal, oldVal) {
+      if(newVal == 0) return;
+      const event = this.events.find(event => event.id == newVal);
+      this.calendar.restoreDaysForEvent(event);
+      this.$emit('cleanedEvent');
     }
   },
   methods: {
